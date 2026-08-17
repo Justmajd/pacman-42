@@ -30,7 +30,7 @@ def read_config_file(path: str) -> dict[str, object]:
     text: list[str] = []
     with open(path, mode="r", encoding="utf-8") as file:
         for line in file:
-            line = line.strip()
+            line = line.strip() 
             if not line or line.startswith("#"):
                 continue
             text.append(line)
