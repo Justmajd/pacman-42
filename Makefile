@@ -28,6 +28,6 @@ lint-strict:
 	mypy . --strict
 
 test:
-	pytest
+	python3 -m pytest
 
 .PHONY: install run debug clean lint lint-strict test
