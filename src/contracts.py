@@ -41,6 +41,9 @@ class Direction(Enum):
     RIGHT = (0, 1)
     NONE = (0, 0)
 
+class WorldEvent(Enum):
+    ...
+
 
 class GridQuery(Protocol):
     def is_walkable(self, position: Position) ->bool:
