@@ -1,5 +1,5 @@
 from src.contracts import LevelData, Position
-from enum import Enum
+from src.contracts import WorldEvent
 
 class World:
     def __init__(
@@ -12,19 +12,19 @@ class World:
         self.player_position = level.player_spawn
         self.ghosts: list[Position] = list(level.ghost_spawns)
 
-    def consume_pickup(self) -> str | None:
+    def consume_pickup(self) -> WorldEvent | None:
         if self.player_position in self.pacgums:
             self.pacgums.remove(self.player_position)
-            return "pacgum"
+            return WorldEvent.PACGUM_EATEN
         elif self.player_position in self.super_pacgums:
             self.super_pacgums.remove(self.player_position)
-            return "super_pacgum"
+            return WorldEvent.SUPER_PACGUM_EATEN
         else:
             return None
 
-    def player_ghost_collision(self) -> str | None:
+    def player_ghost_collision(self) -> WorldEvent | None:
         if self.player_position in self.ghosts:
-            return "player collided with the ghost"
+            return WorldEvent.PLAYER_HIT
         else:
             return None
 

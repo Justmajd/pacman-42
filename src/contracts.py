@@ -42,9 +42,8 @@ class Direction(Enum):
     NONE = (0, 0)
 
 class WorldEvent(Enum):
-    ...
+    PACGUM_EATEN = auto()
+    SUPER_PACGUM_EATEN = auto()
+    PLAYER_HIT = auto()
 
 
-class GridQuery(Protocol):
-    def is_walkable(self, position: Position) ->bool:
-        ...
