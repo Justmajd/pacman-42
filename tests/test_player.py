@@ -6,8 +6,8 @@ class FakeGrid:
     def __init__(self, walkable: set[Position]) -> None:
         self.walkable = walkable
 
-    def is_walkable(self, position: Position) -> bool:
-        return position in self.walkable
+    def is_walkable(self, start: Position, end: Position) -> bool:
+        return end in self.walkable
 
 
 def make_player(

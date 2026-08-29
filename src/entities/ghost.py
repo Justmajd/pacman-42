@@ -38,7 +38,7 @@ class Ghost:
             for d in directions:
                 candidate = (self.position[0] + d.value[0],
                              self.position[1] + d.value[1])
-                if grid.is_walkable(candidate):
+                if grid.is_walkable(self.position, candidate):
                     walkable_directions.append(d)
 
             non_reversing_directions = list(
