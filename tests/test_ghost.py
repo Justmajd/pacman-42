@@ -7,8 +7,8 @@ class MockGrid:
     def __init__(self, walkable_cells: list[tuple[int, int]]):
         self.walkable_cells = walkable_cells
 
-    def is_walkable(self, pos: tuple[int, int]) -> bool:
-        return pos in self.walkable_cells
+    def is_walkable(self, start: tuple[int, int], end: tuple[int, int]) -> bool:
+        return end in self.walkable_cells
 
 def test_ghost_respawn() -> None:
     spawn_pos = (1, 1)

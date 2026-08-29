@@ -16,13 +16,13 @@ class Player:
         candidate = (self.position[0] + self.requested_direction.value[0],
                      self.position[1] + self.requested_direction.value[1])
 
-        if grid.is_walkable(candidate):
+        if grid.is_walkable(self.position, candidate):
             self.direction = self.requested_direction
             self.position = candidate
         else:
             fallback = (self.position[0] + self.direction.value[0],
             self.position[1] + self.direction.value[1])
-            if grid.is_walkable(fallback):
+            if grid.is_walkable(self.position, fallback):
                 self.position = fallback
 
     def respawn(self) -> None:
