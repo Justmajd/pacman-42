@@ -32,11 +32,11 @@ def test_turn_succeeds_when_requested_direction_is_walkable() -> None:
         direction=Direction.RIGHT,
         requested_direction=Direction.UP,
     )
-    grid = FakeGrid(walkable={(4, 5)})
+    grid = FakeGrid(walkable={(5, 4)})
 
     player.update(grid)
 
-    assert player.position == (4, 5)
+    assert player.position == (5, 4)
     assert player.direction == Direction.UP
 
 
@@ -46,12 +46,13 @@ def test_fallback_to_current_direction_when_requested_is_blocked() -> None:
         direction=Direction.RIGHT,
         requested_direction=Direction.UP,
     )
-    grid = FakeGrid(walkable={(5, 6)})
+    grid = FakeGrid(walkable={(6, 5)})
 
     player.update(grid)
 
-    assert player.position == (5, 6)
+    assert player.position == (6, 5)
     assert player.direction == Direction.RIGHT
+
 
 def test_stays_put_when_boxed_in() -> None:
     player = make_player(
@@ -83,19 +84,22 @@ def test_respawn_resets_position_and_direction_but_not_lives() -> None:
     assert player.requested_direction == Direction.NONE
     assert player.lives == 2
 
+
 def test_queued_turn_applies_once_target_becomes_walkable() -> None:
     player = make_player(
         position=(5, 5),
         direction=Direction.RIGHT,
-        requested_direction=Direction.UP
+        requested_direction=Direction.UP,
     )
-    grid = FakeGrid(walkable={(5, 6), (4, 6)})
+    grid = FakeGrid(walkable={(6, 5), (6, 4)})
 
     player.update(grid)
-    assert player.position == (5, 6)
+
+    assert player.position == (6, 5)
     assert player.direction == Direction.RIGHT
     assert player.requested_direction == Direction.UP
 
     player.update(grid)
-    assert player.position == (4, 6)
+
+    assert player.position == (6, 4)
     assert player.direction == Direction.UP

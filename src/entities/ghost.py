@@ -50,6 +50,9 @@ class Ghost:
             else:
                 candidate_directions = non_reversing_directions
 
+            if len(candidate_directions) == 0:
+                return
+
             distances = {}
             for d in candidate_directions:
                 candidate = (self.position[0] + d.value[0],
