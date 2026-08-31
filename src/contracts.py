@@ -45,6 +45,8 @@ class WorldEvent(Enum):
     PACGUM_EATEN = auto()
     SUPER_PACGUM_EATEN = auto()
     PLAYER_HIT = auto()
+    GHOST_EATEN = auto()
+    LEVEL_CLEARED = auto()
 
 class GridQuery(Protocol):
     def is_walkable(self, start: Position, end: Position) -> bool:
