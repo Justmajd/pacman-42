@@ -24,6 +24,7 @@ class GameConfig:
     points_per_ghost: int = 200
     seed: int = 42
     level_max_time: int = 90
+    frightened_duration: float = 6.0
 
 
 def read_config_file(path: str) -> dict[str, object]:
@@ -176,7 +177,20 @@ def load_config(path: str) -> GameConfig:
     if not isinstance(levels, list):
         logger.warning("Invalid 'levels' type, fallback to empty list")
         levels = []
-
+    try:
+        frightened_duration = config_json['frightened_duration']
+    except KeyError:
+        logger.warning("Missing 'frightened_duration' in config, using default 6.0")
+        frightened_duration = 6.0
+    if (
+        isinstance(frightened_duration, bool)
+        or not isinstance(frightened_duration, (float,int))
+        or frightened_duration <= 0 
+    ):
+        logger.warning(
+            "Invalid 'frightened_duration' value (%r), fallback to 6.0", frightened_duration
+        )
+        frightened_duration = 6.0
     level_config: list[LevelConfig] = []
     for verlevel in levels:
         if isinstance(verlevel, dict):
@@ -217,7 +231,7 @@ def load_config(path: str) -> GameConfig:
                 verlevel,
             )
             level_config.append(LevelConfig())
-
+        
     if len(level_config) < 10:
         remaining_num = 10 - len(level_config)
         logger.warning(
@@ -238,5 +252,6 @@ def load_config(path: str) -> GameConfig:
         points_per_ghost=points_per_ghost,
         seed=seed,
         level_max_time=level_max_time,
+        frightened_duration=frightened_duration,
     )
     return game_config
