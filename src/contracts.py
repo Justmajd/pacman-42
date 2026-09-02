@@ -45,7 +45,31 @@ class WorldEvent(Enum):
     PACGUM_EATEN = auto()
     SUPER_PACGUM_EATEN = auto()
     PLAYER_HIT = auto()
+    GHOST_EATEN = auto()
+    LEVEL_CLEARED = auto()
 
 class GridQuery(Protocol):
     def is_walkable(self, start: Position, end: Position) -> bool:
         ...
+
+@dataclass(frozen=True)
+class GhostState:
+    id: int
+    position: Position
+    direction: Direction
+    is_frightened: bool
+    is_active: bool
+
+@dataclass(frozen=True)
+class GameSnapshot:
+    player_pos: Position
+    player_direction: Direction
+    player_is_dying: bool
+    player_is_moving: bool
+    pacgums: frozenset[Position]
+    super_pacgums: frozenset[Position]
+    ghosts: tuple[GhostState, GhostState, GhostState, GhostState]
+    score: int
+    lives: int
+    level: int
+    time: float

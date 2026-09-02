@@ -32,7 +32,6 @@ class Renderer:
         self.top_strip = 50
         self.bottom_strip = 50
 
-        self.last_player_pos = None
         self.death_animation_start = None
 
         self.ghost_color = {
@@ -96,17 +95,11 @@ class Renderer:
         else:
             self.screen.fill((0, 0, 0))
 
-        x, y = snapshot.player_pos
-        cx = (x * self.tile_size) + (self.tile_size // 2)
-        cy = self.top_strip + (y * self.tile_size) + (self.tile_size // 2)
-        player_radius = (self.tile_size // 2)
+        interp_x, interp_y = snapshot.player_pos
+        pixel_x = interp_x * self.tile_size
+        pixel_y = self.top_strip + (interp_y * self.tile_size)
 
-        is_moving = snapshot.player_pos != self.last_player_pos
-        if is_moving:
-            self.last_player_pos = snapshot.player_pos
-
-        pixel_x = x * self.tile_size
-        pixel_y = self.top_strip + (y * self.tile_size)
+        is_moving = snapshot.player_is_moving
 
         if snapshot.player_is_dying:
             if self.death_animation_start is None:
@@ -187,9 +180,9 @@ class Renderer:
             if not ghost.is_active:
                 continue
 
-            x, y = ghost.position
-            pixel_x = x * self.tile_size
-            pixel_y =  self.top_strip + (y * self.tile_size)
+            interp_x, interp_y = ghost.position
+            pixel_x = interp_x * self.tile_size
+            pixel_y = self.top_strip + (interp_y * self.tile_size)
             pixel_size = self.tile_size // 14
 
             if ghost.is_frightened:
