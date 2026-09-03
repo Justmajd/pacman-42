@@ -58,7 +58,9 @@ class GhostState:
     position: Position
     direction: Direction
     is_frightened: bool
+    frightened_time_remaining: float
     is_active: bool
+    is_eaten: bool
 
 @dataclass(frozen=True)
 class GameSnapshot:

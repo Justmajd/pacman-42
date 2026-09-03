@@ -5,7 +5,8 @@ from src.rendering.shapes import (
     PACMAN_RIGHT_OPENED, PACMAN_LEFT_OPENED,
     PACMAN_UP_OPENED, PACMAN_DOWN_OPENED,
     PACMAN_GAMEOVER,
-    GHOST1, GHOST2, GHOST_EYES, GHOST_EYES_PUPIL, GHOST_FRIGHTENED_FACE
+    GHOST1, GHOST2, GHOST_EYES, GHOST_EYES_PUPIL, GHOST_FRIGHTENED_FACE,
+    PACGUMS, SUPER_PACGUMS
 )
 
 
@@ -38,7 +39,7 @@ class Renderer:
             0: (255, 0, 0),
             1: (255, 184, 255),
             2: (0, 255, 255),
-            3: (255, 184, 82)
+            3: (255, 140, 0)
         }
 
     def process_events(self) -> list[pygame.event.Event]:
@@ -55,39 +56,63 @@ class Renderer:
 
         self.tile_size = min(self.window_width // level_data.width, (self.window_height - self.top_strip - self.bottom_strip) // level_data.height)
 
-        for row, walls in enumerate(level_data.walls):
-            for col, wall in enumerate(walls):
-                pixel_x = col * self.tile_size
-                pixel_y = self.top_strip + (row * self.tile_size)
+        width, height = level_data.width, level_data.height
+        walls = level_data.walls
+        line_width = max(2, self.tile_size // 20)
+        wall_color = (0, 0, 255)
 
-                if wall & 1:
-                    pygame.draw.line(
-                        self.background_surface, (0, 0, 255),
-                        (pixel_x, pixel_y),
-                        (pixel_x + self.tile_size, pixel_y),
-                        max(2, self.tile_size // 20)
-                        )
-                if wall & 2:
-                    pygame.draw.line(
-                        self.background_surface, (0, 0, 255),
-                        (pixel_x + self.tile_size, pixel_y),
-                        (pixel_x + self.tile_size, pixel_y + self.tile_size),
-                        max(2, self.tile_size // 20)
-                        )
-                if wall & 4:
-                    pygame.draw.line(
-                        self.background_surface, (0, 0, 255),
-                        (pixel_x, pixel_y + self.tile_size),
-                        (pixel_x + self.tile_size, pixel_y + self.tile_size),
-                        max(2, self.tile_size // 20)
-                        )
-                if wall & 8:
-                    pygame.draw.line(
-                        self.background_surface, (0, 0, 255),
-                        (pixel_x, pixel_y),
-                        (pixel_x, pixel_y + self.tile_size),
-                        max(2, self.tile_size // 20)
-                    )
+        def cell_bit(r: int, c: int, bit: int) -> bool:
+            return 0 <= r < height and 0 <= c < width and (walls[r][c] & bit) != 0
+
+        def is_solid_block(r: int, c: int) -> bool:
+            return 0 <= r < height and 0 <= c < width and walls[r][c] == 15
+
+        def has_h_edge(row: int, col: int) -> bool:
+            if is_solid_block(row - 1, col) and is_solid_block(row, col):
+                return False
+            return cell_bit(row - 1, col, 4) or cell_bit(row, col, 1)
+
+        def has_v_edge(row: int, col: int) -> bool:
+            if is_solid_block(row, col - 1) and is_solid_block(row, col):
+                return False
+            return cell_bit(row, col - 1, 2) or cell_bit(row, col, 8)
+
+        edge_h = [
+            [has_h_edge(row, col) for col in range(width)]
+            for row in range(height + 1)
+        ]
+        edge_v = [
+            [has_v_edge(row, col) for col in range(width + 1)]
+            for row in range(height)
+        ]
+
+        for row in range(height + 1):
+            col = 0
+            while col < width:
+                if edge_h[row][col]:
+                    start_col = col
+                    while col < width and edge_h[row][col]:
+                        col += 1
+                    y = self.top_strip + row * self.tile_size
+                    x1 = start_col * self.tile_size
+                    x2 = col * self.tile_size
+                    pygame.draw.line(self.background_surface, wall_color, (x1, y), (x2, y), line_width)
+                else:
+                    col += 1
+
+        for col in range(width + 1):
+            row = 0
+            while row < height:
+                if edge_v[row][col]:
+                    start_row = row
+                    while row < height and edge_v[row][col]:
+                        row += 1
+                    x = col * self.tile_size
+                    y1 = self.top_strip + start_row * self.tile_size
+                    y2 = self.top_strip + row * self.tile_size
+                    pygame.draw.line(self.background_surface, wall_color, (x, y1), (x, y2), line_width)
+                else:
+                    row += 1
 
     def render(self, snapshot: GameSnapshot) -> None:
         if self.background_surface is not None:
@@ -154,27 +179,37 @@ class Renderer:
                                                     pixel_size, pixel_size))
         
 
+        pacgum_pixel_size = max(1, self.tile_size // 22)
+        pacgum_width = len(PACGUMS[0]) * pacgum_pixel_size
+        pacgum_height = len(PACGUMS) * pacgum_pixel_size
         for pacgums_pos in snapshot.pacgums:
             x, y = pacgums_pos
-            center_x = (x * self.tile_size) + (self.tile_size // 2)
-            center_y = self.top_strip + (y * self.tile_size) + (self.tile_size // 2)
-            pacgums_radius = max(2, self.tile_size // 8)
+            origin_x = x * self.tile_size + (self.tile_size - pacgum_width) // 2
+            origin_y = self.top_strip + y * self.tile_size + (self.tile_size - pacgum_height) // 2
 
-            pygame.draw.circle(
-                self.screen, (255, 255, 255),
-                (center_x, center_y), pacgums_radius
-                )
+            for row_idx, row in enumerate(PACGUMS):
+                for col_idx, cell in enumerate(row):
+                    if cell == '#':
+                        pygame.draw.rect(self.screen, (255, 255, 255),
+                                        pygame.Rect(origin_x + col_idx * pacgum_pixel_size,
+                                                    origin_y + row_idx * pacgum_pixel_size,
+                                                    pacgum_pixel_size, pacgum_pixel_size))
 
+        super_pacgum_pixel_size = max(1, self.tile_size // 16)
+        super_pacgum_width = len(SUPER_PACGUMS[0]) * super_pacgum_pixel_size
+        super_pacgum_height = len(SUPER_PACGUMS) * super_pacgum_pixel_size
         for super_pacgums_pos in snapshot.super_pacgums:
             x, y = super_pacgums_pos
-            center_x = (x * self.tile_size) + (self.tile_size // 2)
-            center_y = self.top_strip + (y * self.tile_size) + (self.tile_size // 2)
-            super_pacgums_radius = max(4, self.tile_size // 8)
+            origin_x = x * self.tile_size + (self.tile_size - super_pacgum_width) // 2
+            origin_y = self.top_strip + y * self.tile_size + (self.tile_size - super_pacgum_height) // 2
 
-            pygame.draw.circle(
-                self.screen, (255, 255, 255),
-                (center_x, center_y), super_pacgums_radius
-                )
+            for row_idx, row in enumerate(SUPER_PACGUMS):
+                for col_idx, cell in enumerate(row):
+                    if cell == '#':
+                        pygame.draw.rect(self.screen, (255, 255, 255),
+                                        pygame.Rect(origin_x + col_idx * super_pacgum_pixel_size,
+                                                    origin_y + row_idx * super_pacgum_pixel_size,
+                                                    super_pacgum_pixel_size, super_pacgum_pixel_size))
 
         for ghost in snapshot.ghosts:
             if not ghost.is_active:
@@ -186,24 +221,31 @@ class Renderer:
             pixel_size = self.tile_size // 14
 
             if ghost.is_frightened:
-                color = (0, 0, 128)
+                flashing = ghost.frightened_time_remaining <= 2.0
+                if flashing and (pygame.time.get_ticks() // 200) % 2 == 0:
+                    color = (255, 255, 255)
+                    face_color = (255, 0, 0)
+                else:
+                    color = (0, 0, 128)
+                    face_color = (255, 182, 174)
             else:
                 color = self.ghost_color[ghost.id]
 
-            if tick % 2 != 0:
-                        sprite_to_draw = GHOST1
-            else:
-                sprite_to_draw = GHOST2
-            
-            for row_idx, row in enumerate(sprite_to_draw):
-                for col_idx, cell in enumerate(row):
-                    if cell == '#':
-                        pygame.draw.rect(self.screen, color,
-                                         pygame.Rect(pixel_x + col_idx * pixel_size,
-                                                     pixel_y + row_idx * pixel_size,
-                                                     pixel_size, pixel_size))
+            if not ghost.is_eaten:
+                if tick % 2 != 0:
+                            sprite_to_draw = GHOST1
+                else:
+                    sprite_to_draw = GHOST2
+                
+                for row_idx, row in enumerate(sprite_to_draw):
+                    for col_idx, cell in enumerate(row):
+                        if cell == '#':
+                            pygame.draw.rect(self.screen, color,
+                                            pygame.Rect(pixel_x + col_idx * pixel_size,
+                                                        pixel_y + row_idx * pixel_size,
+                                                        pixel_size, pixel_size))
 
-            if not ghost.is_frightened:
+            if not ghost.is_frightened or ghost.is_eaten:
                 eyes_col_offset = 2
                 eyes_row_offset = 3
                 pupil_col_offset = eyes_col_offset + 1
@@ -238,7 +280,7 @@ class Renderer:
                     for col_idx, cell in enumerate(row):
                         if cell == '#':
                             pygame.draw.rect(
-                                self.screen, (0, 0, 139),
+                                self.screen, (0, 0, 255),
                                 pygame.Rect(
                                     pixel_x + (pupil_col_offset + col_idx) * pixel_size,
                                     pixel_y + (pupil_row_offset + row_idx) * pixel_size,
@@ -253,7 +295,7 @@ class Renderer:
                     for col_idx, cell in enumerate(row):
                         if cell == '#':
                             pygame.draw.rect(
-                                self.screen, (255, 182, 174),
+                                self.screen, face_color,
                                 pygame.Rect(
                                     pixel_x + (face_col_offset + col_idx) * pixel_size,
                                     pixel_y + (face_row_offset + row_idx) * pixel_size,

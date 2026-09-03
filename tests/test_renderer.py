@@ -2,12 +2,12 @@ import os
 
 os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
 
-import pygame  # noqa: E402
+import pygame
 
-from src.contracts import (  # noqa: E402
+from src.contracts import (
     Direction, GameSnapshot, GhostState, LevelData,
 )
-from src.rendering.renderer import Renderer  # noqa: E402
+from src.rendering.renderer import Renderer
 
 
 def make_level(
@@ -34,7 +34,8 @@ def make_ghosts() -> tuple[GhostState, ...]:
     return tuple(
         GhostState(
             id=i, position=(i, 0), direction=Direction.RIGHT,
-            is_frightened=False, is_active=True,
+            is_frightened=False, frightened_time_remaining=0.0,
+            is_active=True, is_eaten=False,
         )
         for i in range(4)
     )
@@ -45,6 +46,7 @@ def make_snapshot(**overrides: object) -> GameSnapshot:
         player_pos=(1, 1),
         player_direction=Direction.RIGHT,
         player_is_dying=False,
+        player_is_moving=True,
         pacgums=frozenset(),
         super_pacgums=frozenset(),
         ghosts=make_ghosts(),
@@ -54,7 +56,7 @@ def make_snapshot(**overrides: object) -> GameSnapshot:
         time=90.0,
     )
     defaults.update(overrides)
-    return GameSnapshot(**defaults)  # type: ignore[arg-type]
+    return GameSnapshot(**defaults)
 
 
 def test_renderer_initializes_without_crashing() -> None:
@@ -95,24 +97,27 @@ def test_player_position_maps_to_correct_pixel_no_xy_swap() -> None:
     renderer = Renderer(300, 300, "test")
     renderer.load_level(make_level(width=3, height=3))
 
-    circle_calls: list[tuple[int, int]] = []
-    real_circle = pygame.draw.circle
+    rect_calls: list[pygame.Rect] = []
+    real_rect = pygame.draw.rect
 
     def spy(surface: object, color: object,
-            center: tuple[int, int], radius: object) -> object:
-        circle_calls.append(center)
-        return real_circle(surface, color, center, radius)
+            rect: pygame.Rect, **kwargs: object) -> object:
+        rect_calls.append(rect)
+        return real_rect(surface, color, rect, **kwargs)
 
-    pygame.draw.circle = spy
+    pygame.draw.rect = spy
     try:
         renderer.render(make_snapshot(player_pos=(2, 0)))
     finally:
-        pygame.draw.circle = real_circle
+        pygame.draw.rect = real_rect
 
-    player_center = circle_calls[0]
-    expected_x = 2 * renderer.tile_size + renderer.tile_size // 2
-    expected_y = renderer.top_strip + renderer.tile_size // 2
-    assert player_center == (expected_x, expected_y)
+    first_player_rect = rect_calls[0]
+    expected_x_min = 2 * renderer.tile_size
+    expected_x_max = 3 * renderer.tile_size
+    expected_y_min = renderer.top_strip
+    expected_y_max = renderer.top_strip + renderer.tile_size
+    assert expected_x_min <= first_player_rect.x < expected_x_max
+    assert expected_y_min <= first_player_rect.y < expected_y_max
     renderer.cleanup()
 
 
@@ -134,8 +139,9 @@ def test_ghost_colors_are_distinct() -> None:
     finally:
         pygame.draw.rect = real_rect
 
-    assert len(rect_colors) == 4
-    assert len(set(rect_colors)) == 4
+    ghost_colors = set(renderer.ghost_color.values())
+    assert len(ghost_colors) == 4
+    assert ghost_colors.issubset(set(rect_colors))
     renderer.cleanup()
 
 
@@ -155,21 +161,26 @@ def test_ghost_frightened_override_and_inactive_skipped() -> None:
     try:
         ghosts = (
             GhostState(id=0, position=(0, 0), direction=Direction.RIGHT,
-                       is_frightened=True, is_active=True),
+                       is_frightened=True, frightened_time_remaining=5.0,
+                       is_active=True, is_eaten=False),
             GhostState(id=1, position=(1, 0), direction=Direction.RIGHT,
-                       is_frightened=False, is_active=True),
+                       is_frightened=False, frightened_time_remaining=0.0,
+                       is_active=True, is_eaten=False),
             GhostState(id=2, position=(2, 0), direction=Direction.RIGHT,
-                       is_frightened=False, is_active=False),
+                       is_frightened=False, frightened_time_remaining=0.0,
+                       is_active=False, is_eaten=False),
             GhostState(id=3, position=(3, 0), direction=Direction.RIGHT,
-                       is_frightened=False, is_active=True),
+                       is_frightened=False, frightened_time_remaining=0.0,
+                       is_active=True, is_eaten=False),
         )
         renderer.render(make_snapshot(ghosts=ghosts))
     finally:
         pygame.draw.rect = real_rect
 
-    assert len(rect_colors) == 3
-    normal_ghost0_color = renderer.ghost_color[0]
-    assert rect_colors[0] != normal_ghost0_color
+    assert renderer.ghost_color[0] not in rect_colors
+    assert renderer.ghost_color[1] in rect_colors
+    assert renderer.ghost_color[2] not in rect_colors
+    assert renderer.ghost_color[3] in rect_colors
     renderer.cleanup()
 
 
