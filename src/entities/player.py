@@ -57,12 +57,10 @@ class Player:
                 self.progress = 0.0
                 break
 
-    @property
     def render_position(self) -> tuple[float, float]:
         return (self.position[0] + self.direction.value[0] * self.progress,
                 self.position[1] + self.direction.value[1] * self.progress)
 
-    @property
     def is_moving(self) -> bool:
         return self.direction is not Direction.NONE
 
