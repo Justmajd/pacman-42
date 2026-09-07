@@ -345,7 +345,11 @@ class Renderer:
         
 
         pygame.display.flip()
-        self.clock.tick(60)
 
     def cleanup(self) -> None:
         pygame.quit()
+
+    def tick(self) -> float:
+        milliseconds = self.clock.tick(60)
+        seconds = milliseconds / 1000
+        return seconds
