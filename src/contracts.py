@@ -75,3 +75,5 @@ class GameSnapshot:
     lives: int
     level: int
     time: float
+    level_start_countdown: float
+

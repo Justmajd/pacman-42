@@ -69,3 +69,4 @@ class Player:
         self.direction = Direction.NONE
         self.requested_direction = Direction.NONE
         self.facing = Direction.NONE
+        self.progress = 0.0

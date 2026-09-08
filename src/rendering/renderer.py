@@ -8,6 +8,7 @@ from src.rendering.shapes import (
     GHOST1, GHOST2, GHOST_EYES, GHOST_EYES_PUPIL, GHOST_FRIGHTENED_FACE,
     PACGUMS, SUPER_PACGUMS
 )
+from math import ceil
 
 
 class Renderer:
@@ -125,6 +126,7 @@ class Renderer:
         pixel_y = self.top_strip + (interp_y * self.tile_size)
 
         is_moving = snapshot.player_is_moving
+        tick = pygame.time.get_ticks() // 150
 
         if snapshot.player_is_dying:
             if self.death_animation_start is None:
@@ -144,7 +146,6 @@ class Renderer:
                                                     pixel_size, pixel_size))
         else:
             self.death_animation_start = None
-            tick = pygame.time.get_ticks() // 150
 
             if snapshot.player_direction == Direction.NONE:
                 half_open, wide_open = PACMAN_CLOSED, PACMAN_CLOSED
@@ -233,7 +234,7 @@ class Renderer:
 
             if not ghost.is_eaten:
                 if tick % 2 != 0:
-                            sprite_to_draw = GHOST1
+                    sprite_to_draw = GHOST1
                 else:
                     sprite_to_draw = GHOST2
                 
@@ -342,8 +343,16 @@ class Renderer:
         x = lives_center[0] + lives_radius + 10
         y = lives_center[1] - (lives_surface.get_height() // 2)
         self.screen.blit(lives_surface, (x, y))
-        
-
+        if snapshot.level_start_countdown > 0:
+            counter_num = ceil(snapshot.level_start_countdown)
+            counter_text = str(counter_num)
+            counter_font =  pygame.font.SysFont(None,72)
+            counter_surface = counter_font.render(counter_text,True,(255,255,255))
+            counter_width = counter_surface.get_width()
+            counter_height = counter_surface.get_height()
+            counter_x = ((self.window_width//2)-(counter_width//2))
+            counter_y = ((self.window_height//2)-(counter_height//2))
+            self.screen.blit(counter_surface,(counter_x,counter_y))
         pygame.display.flip()
 
     def cleanup(self) -> None:

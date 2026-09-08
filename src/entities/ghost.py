@@ -134,3 +134,13 @@ class Ghost:
     def render_position(self) -> tuple[float, float]:
         return (self.position[0] + self.direction.value[0] * self.progress,
                 self.position[1] + self.direction.value[1] * self.progress)
+
+    def respawn(self) -> None:
+        self.position = self.spawn
+        self.direction = Direction.NONE
+        self.progress = 0.0
+        self.active = True
+        self.respawn_delay = 0.0
+        self.is_eaten = False
+        self.requested_direction = Direction.NONE
+        self.facing = Direction.NONE

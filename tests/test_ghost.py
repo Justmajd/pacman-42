@@ -1,5 +1,7 @@
 import random
 
+import pytest
+
 from src.contracts import Direction
 from src.entities.ghost import Ghost
 
@@ -53,6 +55,7 @@ def test_ghost_respawn() -> None:
     assert ghost.active
     assert ghost.position == spawn_pos
     assert ghost.direction == Direction.NONE
+    assert ghost.progress == 0.0
 
 
 def test_ghost_chase_no_tie() -> None:
@@ -75,7 +78,9 @@ def test_ghost_chase_no_tie() -> None:
     )
 
     assert ghost.direction == Direction.DOWN
-    assert ghost.position == (2, 3)
+    assert ghost.position == (2, 2)
+    assert ghost.progress == pytest.approx(0.6)
+    assert ghost.render_position() == pytest.approx((2.0, 2.6))
 
 
 def test_ghost_flee_no_tie() -> None:
@@ -98,7 +103,9 @@ def test_ghost_flee_no_tie() -> None:
     )
 
     assert ghost.direction == Direction.RIGHT
-    assert ghost.position == (3, 2)
+    assert ghost.position == (2, 2)
+    assert ghost.progress == pytest.approx(0.6)
+    assert ghost.render_position() == pytest.approx((2.6, 2.0))
 
 
 def test_ghost_deterministic_tie_breaker() -> None:
@@ -121,13 +128,14 @@ def test_ghost_deterministic_tie_breaker() -> None:
     )
 
     assert ghost.direction == Direction.DOWN
-    assert ghost.position == (2, 3)
+    assert ghost.position == (2, 2)
+    assert ghost.progress == pytest.approx(0.6)
 
 
 def test_ghost_dead_end_reversal() -> None:
     ghost = Ghost(
         position=(5, 5),
-        direction=Direction.RIGHT,
+        direction=Direction.NONE,
         spawn=(1, 1),
         active=True,
         respawn_delay=0.0,
@@ -144,7 +152,9 @@ def test_ghost_dead_end_reversal() -> None:
     )
 
     assert ghost.direction == Direction.LEFT
-    assert ghost.position == (4, 5)
+    assert ghost.position == (5, 5)
+    assert ghost.progress == pytest.approx(0.6)
+    assert ghost.render_position() == pytest.approx((4.4, 5.0))
 
 
 def test_ghost_no_walkable_direction_stays_put() -> None:
@@ -168,3 +178,4 @@ def test_ghost_no_walkable_direction_stays_put() -> None:
 
     assert ghost.position == (5, 5)
     assert ghost.direction == Direction.NONE
+    assert ghost.progress == 0.0

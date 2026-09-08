@@ -17,51 +17,41 @@ def make_level(
     )
 
 
-def test_world_stores_mutable_pickups() -> None:
+def test_world_copies_pickup_sets() -> None:
     level = make_level(
-        pacgums=frozenset({(1, 1), (2, 2)}),
-        super_pacgums=frozenset({(5, 5)}),
+        pacgums=frozenset({(1, 1)}),
+        super_pacgums=frozenset({(2, 2)}),
     )
 
     world = World(level)
 
-    assert world.pacgums == {(1, 1), (2, 2)}
-    assert world.super_pacgums == {(5, 5)}
+    assert world.pacgums == {(1, 1)}
+    assert world.super_pacgums == {(2, 2)}
     assert isinstance(world.pacgums, set)
     assert isinstance(world.super_pacgums, set)
 
 
 def test_consume_normal_pacgum() -> None:
     level = make_level(
-        pacgums=frozenset({(3, 3), (4, 4)}),
+        pacgums=frozenset({(1, 1), (2, 2)}),
     )
     world = World(level)
+    world.player_position = (1, 1)
 
     events = world.consume_pickup()
 
     assert events == (WorldEvent.PACGUM_EATEN,)
-    assert (3, 3) not in world.pacgums
-    assert (4, 4) in world.pacgums
+    assert (1, 1) not in world.pacgums
+    assert (2, 2) in world.pacgums
 
 
-def test_consume_super_pacgum() -> None:
+def test_last_normal_pacgum_clears_level() -> None:
     level = make_level(
-        pacgums=frozenset({(4, 4)}),
-        super_pacgums=frozenset({(3, 3)}),
+        pacgums=frozenset({(1, 1)}),
+        super_pacgums=frozenset({(2, 2), (3, 3)}),
     )
     world = World(level)
-
-    events = world.consume_pickup()
-
-    assert events == (WorldEvent.SUPER_PACGUM_EATEN,)
-    assert (3, 3) not in world.super_pacgums
-
-
-def test_final_normal_pacgum_emits_level_cleared() -> None:
-    level = make_level(
-        pacgums=frozenset({(3, 3)}),
-    )
-    world = World(level)
+    world.player_position = (1, 1)
 
     events = world.consume_pickup()
 
@@ -70,44 +60,57 @@ def test_final_normal_pacgum_emits_level_cleared() -> None:
         WorldEvent.LEVEL_CLEARED,
     )
     assert world.pacgums == set()
-    assert world.super_pacgums == set()
+    assert world.super_pacgums == {(2, 2), (3, 3)}
 
 
-def test_final_super_pacgum_emits_level_cleared() -> None:
+def test_consume_super_pacgum() -> None:
     level = make_level(
-        super_pacgums=frozenset({(3, 3)}),
+        pacgums=frozenset({(1, 1)}),
+        super_pacgums=frozenset({(2, 2)}),
     )
     world = World(level)
+    world.player_position = (2, 2)
 
     events = world.consume_pickup()
 
-    assert events == (
-        WorldEvent.SUPER_PACGUM_EATEN,
-        WorldEvent.LEVEL_CLEARED,
+    assert events == (WorldEvent.SUPER_PACGUM_EATEN,)
+    assert (2, 2) not in world.super_pacgums
+    assert (1, 1) in world.pacgums
+
+
+def test_super_pacgum_does_not_clear_level_when_no_normal_pacgums() -> None:
+    level = make_level(
+        pacgums=frozenset(),
+        super_pacgums=frozenset({(2, 2)}),
     )
-    assert world.pacgums == set()
+    world = World(level)
+    world.player_position = (2, 2)
+
+    events = world.consume_pickup()
+
+    assert events == (WorldEvent.SUPER_PACGUM_EATEN,)
     assert world.super_pacgums == set()
 
 
 def test_no_pickup_returns_empty_tuple() -> None:
     level = make_level(
         pacgums=frozenset({(1, 1)}),
-        super_pacgums=frozenset({(5, 5)}),
+        super_pacgums=frozenset({(2, 2)}),
     )
     world = World(level)
+    world.player_position = (3, 3)
 
     events = world.consume_pickup()
 
     assert events == ()
-    assert world.pacgums == {(1, 1)}
-    assert world.super_pacgums == {(5, 5)}
 
 
-def test_pickup_is_only_consumed_once() -> None:
+def test_pickup_can_only_be_consumed_once() -> None:
     level = make_level(
-        pacgums=frozenset({(3, 3), (4, 4)}),
+        pacgums=frozenset({(1, 1), (2, 2)}),
     )
     world = World(level)
+    world.player_position = (1, 1)
 
     first_events = world.consume_pickup()
     second_events = world.consume_pickup()
@@ -116,21 +119,21 @@ def test_pickup_is_only_consumed_once() -> None:
     assert second_events == ()
 
 
-def test_player_ghost_collision_emits_player_hit() -> None:
+def test_player_ghost_collision_returns_correct_index() -> None:
     level = make_level()
     world = World(level)
+    world.player_position = (6, 0)
 
-    world.ghosts[0] = world.player_position
+    collision_index = world.player_ghost_collision()
 
-    event = world.player_ghost_collision()
-
-    assert event == WorldEvent.PLAYER_HIT
+    assert collision_index == 1
 
 
-def test_no_player_ghost_collision_returns_none() -> None:
+def test_player_ghost_collision_returns_none() -> None:
     level = make_level()
     world = World(level)
+    world.player_position = (3, 3)
 
-    event = world.player_ghost_collision()
+    collision_index = world.player_ghost_collision()
 
-    assert event is None
+    assert collision_index is None

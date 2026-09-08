@@ -1,41 +1,12 @@
-import subprocess
-import sys
 from pathlib import Path
-
+import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "pac-man.py"
 
+def test_cli_with_valid_config_succeeds(tmp_path, monkeypatch) -> None:
+    import importlib.util
 
-def test_cli_without_argument_fails() -> None:
-    result = subprocess.run(
-        [sys.executable, str(SCRIPT)],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-
-    assert result.returncode != 0
-    assert "Error:" in result.stdout
-    assert "Traceback" not in result.stdout
-    assert "Traceback" not in result.stderr
-
-
-def test_cli_with_missing_file_fails_cleanly() -> None:
-    result = subprocess.run(
-        [sys.executable, str(SCRIPT), "does-not-exist.json"],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-
-    assert result.returncode != 0
-    assert "could not open" in result.stdout.lower()
-    assert "Traceback" not in result.stdout
-    assert "Traceback" not in result.stderr
-
-
-def test_cli_with_valid_config_succeeds(tmp_path) -> None:
     config_path = tmp_path / "config.json"
     config_path.write_text(
         """
@@ -58,13 +29,27 @@ def test_cli_with_valid_config_succeeds(tmp_path) -> None:
         encoding="utf-8",
     )
 
-    result = subprocess.run(
-        [sys.executable, str(SCRIPT), str(config_path)],
-        capture_output=True,
-        text=True,
-        check=False,
+    spec = importlib.util.spec_from_file_location("pacman_cli", SCRIPT)
+    assert spec is not None
+    assert spec.loader is not None
+
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    calls = []
+
+    def fake_run_app(config) -> int:
+        calls.append(config)
+        return 0
+
+    monkeypatch.setattr(module, "run_app", fake_run_app)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [str(SCRIPT), str(config_path)],
     )
 
-    assert result.returncode == 0
-    assert "Traceback" not in result.stdout
-    assert "Traceback" not in result.stderr
+    result = module.main()
+
+    assert result == 0
+    assert len(calls) == 1

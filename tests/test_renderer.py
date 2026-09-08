@@ -54,6 +54,7 @@ def make_snapshot(**overrides: object) -> GameSnapshot:
         lives=3,
         level=1,
         time=90.0,
+        level_start_countdown=0.0,
     )
     defaults.update(overrides)
     return GameSnapshot(**defaults)
