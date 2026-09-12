@@ -1,15 +1,16 @@
 import json
+from pathlib import Path
 
 from src.config import GameConfig, load_config
 
 
-def write_config(tmp_path, data: object) -> str:
+def write_config(tmp_path: Path, data: object) -> str:
     config_path = tmp_path / "config.json"
     config_path.write_text(json.dumps(data), encoding="utf-8")
     return str(config_path)
 
 
-def test_load_valid_config(tmp_path) -> None:
+def test_load_valid_config(tmp_path: Path) -> None:
     data = {
         "highscore_filename": "scores.json",
         "levels": [
@@ -40,7 +41,7 @@ def test_load_valid_config(tmp_path) -> None:
     assert config.levels[0].height == 15
 
 
-def test_missing_values_use_defaults(tmp_path) -> None:
+def test_missing_values_use_defaults(tmp_path: Path) -> None:
     config = load_config(write_config(tmp_path, {}))
 
     defaults = GameConfig()
@@ -56,7 +57,7 @@ def test_missing_values_use_defaults(tmp_path) -> None:
     assert len(config.levels) == 10
 
 
-def test_invalid_integer_values_use_defaults(tmp_path) -> None:
+def test_invalid_integer_values_use_defaults(tmp_path: Path) -> None:
     data = {
         "lives": -1,
         "pacgum_count": 0,
@@ -78,7 +79,7 @@ def test_invalid_integer_values_use_defaults(tmp_path) -> None:
     assert config.level_max_time == 90
 
 
-def test_levels_are_padded_to_ten(tmp_path) -> None:
+def test_levels_are_padded_to_ten(tmp_path: Path) -> None:
     data = {
         "levels": [
             {"width": 20, "height": 21},
@@ -99,7 +100,7 @@ def test_levels_are_padded_to_ten(tmp_path) -> None:
         assert level.height == 15
 
 
-def test_invalid_level_entries_use_defaults(tmp_path) -> None:
+def test_invalid_level_entries_use_defaults(tmp_path: Path) -> None:
     data = {
         "levels": [
             {"width": 5, "height": 5},
@@ -119,7 +120,7 @@ def test_invalid_level_entries_use_defaults(tmp_path) -> None:
     assert config.levels[1].height == 15
 
 
-def test_comment_lines_are_ignored(tmp_path) -> None:
+def test_comment_lines_are_ignored(tmp_path: Path) -> None:
     config_path = tmp_path / "config.json"
     config_path.write_text(
         '# comment before config\n'
@@ -137,7 +138,7 @@ def test_comment_lines_are_ignored(tmp_path) -> None:
     assert config.level_max_time == 100
 
 
-def test_malformed_json_raises_value_error(tmp_path) -> None:
+def test_malformed_json_raises_value_error(tmp_path: Path) -> None:
     config_path = tmp_path / "config.json"
     config_path.write_text('{"lives": 3', encoding="utf-8")
 
@@ -149,7 +150,7 @@ def test_malformed_json_raises_value_error(tmp_path) -> None:
         raise AssertionError("Expected ValueError")
 
 
-def test_non_object_root_raises_value_error(tmp_path) -> None:
+def test_non_object_root_raises_value_error(tmp_path: Path) -> None:
     config_path = tmp_path / "config.json"
     config_path.write_text("[1, 2, 3]", encoding="utf-8")
 

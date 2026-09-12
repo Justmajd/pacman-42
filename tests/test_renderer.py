@@ -1,13 +1,14 @@
 import os
+from typing import Any, cast
 
 os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
 
-import pygame
+import pygame  # noqa: E402
 
-from src.contracts import (
+from src.contracts import (  # noqa: E402
     Direction, GameSnapshot, GhostState, LevelData,
 )
-from src.rendering.renderer import Renderer
+from src.rendering.renderer import Renderer  # noqa: E402
 
 
 def make_level(
@@ -57,7 +58,7 @@ def make_snapshot(**overrides: object) -> GameSnapshot:
         level_start_countdown=0.0,
     )
     defaults.update(overrides)
-    return GameSnapshot(**defaults)
+    return GameSnapshot(**cast(Any, defaults))
 
 
 def test_renderer_initializes_without_crashing() -> None:
@@ -99,14 +100,14 @@ def test_player_position_maps_to_correct_pixel_no_xy_swap() -> None:
     renderer.load_level(make_level(width=3, height=3))
 
     rect_calls: list[pygame.Rect] = []
-    real_rect = pygame.draw.rect
+    real_rect: Any = pygame.draw.rect
 
     def spy(surface: object, color: object,
             rect: pygame.Rect, **kwargs: object) -> object:
         rect_calls.append(rect)
         return real_rect(surface, color, rect, **kwargs)
 
-    pygame.draw.rect = spy
+    pygame.draw.rect = spy  # type: ignore[assignment]
     try:
         renderer.render(make_snapshot(player_pos=(2, 0)))
     finally:
@@ -127,14 +128,14 @@ def test_ghost_colors_are_distinct() -> None:
     renderer.load_level(make_level())
 
     rect_colors: list[tuple[int, int, int]] = []
-    real_rect = pygame.draw.rect
+    real_rect: Any = pygame.draw.rect
 
     def spy(surface: object, color: tuple[int, int, int],
             rect: object, **kwargs: object) -> object:
         rect_colors.append(color)
         return real_rect(surface, color, rect, **kwargs)
 
-    pygame.draw.rect = spy
+    pygame.draw.rect = spy  # type: ignore[assignment]
     try:
         renderer.render(make_snapshot())
     finally:
@@ -151,14 +152,14 @@ def test_ghost_frightened_override_and_inactive_skipped() -> None:
     renderer.load_level(make_level())
 
     rect_colors: list[tuple[int, int, int]] = []
-    real_rect = pygame.draw.rect
+    real_rect: Any = pygame.draw.rect
 
     def spy(surface: object, color: tuple[int, int, int],
             rect: object, **kwargs: object) -> object:
         rect_colors.append(color)
         return real_rect(surface, color, rect, **kwargs)
 
-    pygame.draw.rect = spy
+    pygame.draw.rect = spy  # type: ignore[assignment]
     try:
         ghosts = (
             GhostState(id=0, position=(0, 0), direction=Direction.RIGHT,

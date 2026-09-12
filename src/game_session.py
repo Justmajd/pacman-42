@@ -2,14 +2,15 @@ from src.config import GameConfig
 from src.contracts import GameState
 from src.contracts import WorldEvent
 
+
 class GameSession:
     def __init__(self, config: GameConfig) -> None:
         self.score = 0
         self.lives = config.lives
         self.level = 1
-        self.level_time_remaining = config.level_max_time
-        self.frightened_time_remaining = 0.0
-        self.state : GameState = GameState.PLAYING
+        self.level_time_remaining: float = float(config.level_max_time)
+        self.frightened_time_remaining: float = 0.0
+        self.state: GameState = GameState.PLAYING
         self.config = config
 
     def update(self, dt: float) -> None:
@@ -18,7 +19,7 @@ class GameSession:
             if self.level_time_remaining <= 0.0:
                 self.level_time_remaining = 0.0
             if self.level_time_remaining == 0.0:
-                self.state = GameState.GAME_OVER 
+                self.state = GameState.GAME_OVER
             if self.frightened_time_remaining > 0:
                 self.frightened_time_remaining -= dt
         if self.frightened_time_remaining <= 0.0:
@@ -40,7 +41,7 @@ class GameSession:
         if event == WorldEvent.LEVEL_CLEARED:
             if self.level < len(self.config.levels):
                 self.level += 1
-                self.level_time_remaining = self.config.level_max_time
+                self.level_time_remaining = float(self.config.level_max_time)
                 self.frightened_time_remaining = 0.0
             else:
                 self.state = GameState.VICTORY

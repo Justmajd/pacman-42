@@ -140,7 +140,6 @@ PACMAN_DOWN_OPENED = [
     "##         ##",
     "             ",
     "             ",
-    
 ]
 
 PACMAN_GAMEOVER = [

@@ -1,10 +1,18 @@
 from pathlib import Path
 import sys
 
+import pytest
+
+from src.config import GameConfig
+
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "pac-man.py"
 
-def test_cli_with_valid_config_succeeds(tmp_path, monkeypatch) -> None:
+
+def test_cli_with_valid_config_succeeds(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     import importlib.util
 
     config_path = tmp_path / "config.json"
@@ -36,9 +44,9 @@ def test_cli_with_valid_config_succeeds(tmp_path, monkeypatch) -> None:
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
 
-    calls = []
+    calls: list[GameConfig] = []
 
-    def fake_run_app(config) -> int:
+    def fake_run_app(config: GameConfig) -> int:
         calls.append(config)
         return 0
 

@@ -1,5 +1,7 @@
 from src.contracts import LevelData, Position
 from src.contracts import WorldEvent
+
+
 class World:
     def __init__(
         self,
@@ -12,7 +14,7 @@ class World:
         self.ghosts: list[Position] = list(level.ghost_spawns)
 
     def consume_pickup(self) -> tuple[WorldEvent, ...]:
-        events : list[WorldEvent] = []
+        events: list[WorldEvent] = []
         if self.player_position in self.pacgums:
             self.pacgums.remove(self.player_position)
             events.append(WorldEvent.PACGUM_EATEN)
@@ -25,11 +27,8 @@ class World:
             return tuple(events)
         return tuple(events)
 
-
     def player_ghost_collision(self) -> int | None:
-        for ghost_index,ghost in enumerate(self.ghosts):
+        for ghost_index, ghost in enumerate(self.ghosts):
             if self.player_position == ghost:
                 return ghost_index
         return None
-        
-
