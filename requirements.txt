@@ -1,4 +1,4 @@
 flake8
 mypy
 pytest
-pygame
+pygame-ce==2.5.8

@@ -31,7 +31,7 @@ def read_config_file(path: str) -> dict[str, object]:
     text: list[str] = []
     with open(path, mode="r", encoding="utf-8") as file:
         for line in file:
-            line = line.strip() 
+            line = line.strip()
             if not line or line.startswith("#"):
                 continue
             text.append(line)
@@ -180,15 +180,18 @@ def load_config(path: str) -> GameConfig:
     try:
         frightened_duration = config_json['frightened_duration']
     except KeyError:
-        logger.warning("Missing 'frightened_duration' in config, using default 6.0")
+        logger.warning(
+            "Missing 'frightened_duration' in config, using default 6.0"
+        )
         frightened_duration = 6.0
     if (
         isinstance(frightened_duration, bool)
-        or not isinstance(frightened_duration, (float,int))
-        or frightened_duration <= 0 
+        or not isinstance(frightened_duration, (float, int))
+        or frightened_duration <= 0
     ):
         logger.warning(
-            "Invalid 'frightened_duration' value (%r), fallback to 6.0", frightened_duration
+            "Invalid 'frightened_duration' value (%r), fallback to 6.0",
+            frightened_duration,
         )
         frightened_duration = 6.0
     level_config: list[LevelConfig] = []
@@ -231,7 +234,7 @@ def load_config(path: str) -> GameConfig:
                 verlevel,
             )
             level_config.append(LevelConfig())
-        
+
     if len(level_config) < 10:
         remaining_num = 10 - len(level_config)
         logger.warning(

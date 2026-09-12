@@ -1,13 +1,14 @@
 import json
 from pathlib import Path
+from typing import Any, cast
 
 
 FIXTURE_PATH = Path("tests/fixtures/stub_level.json")
 
 
-def load_fixture() -> dict:
+def load_fixture() -> dict[str, Any]:
     with FIXTURE_PATH.open("r", encoding="utf-8") as fixture_file:
-        return json.load(fixture_file)
+        return cast(dict[str, Any], json.load(fixture_file))
 
 
 def test_stub_level_dimensions_match_walls() -> None:
