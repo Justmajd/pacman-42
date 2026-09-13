@@ -35,6 +35,7 @@ class GameSession:
             self.score += self.config.points_per_ghost
         if event == WorldEvent.PLAYER_HIT:
             self.lives -= 1
+            self.frightened_time_remaining = 0.0
             if self.lives <= 0:
                 self.lives = 0
                 self.state = GameState.GAME_OVER

@@ -14,6 +14,9 @@ class GameState(Enum):
     GAME_OVER = auto()
     VICTORY = auto()
     NAME_ENTRY = auto()
+    HIGHSCORES = auto()
+    INSTRUCTIONS = auto()
+    EXIT = auto()
 
 
 @dataclass(frozen=True)
@@ -82,3 +85,4 @@ class GameSnapshot:
     level: int
     time: float
     level_start_countdown: float
+    level_cleared: bool

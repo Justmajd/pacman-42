@@ -122,9 +122,10 @@ def test_pickup_can_only_be_consumed_once() -> None:
 def test_player_ghost_collision_returns_correct_index() -> None:
     level = make_level()
     world = World(level)
-    world.player_position = (6, 0)
 
-    collision_index = world.player_ghost_collision()
+    collision_index = world.player_ghost_collision(
+        (6, 0), [(0, 0), (6, 0), (0, 6), (6, 6)]
+    )
 
     assert collision_index == 1
 
@@ -132,8 +133,9 @@ def test_player_ghost_collision_returns_correct_index() -> None:
 def test_player_ghost_collision_returns_none() -> None:
     level = make_level()
     world = World(level)
-    world.player_position = (3, 3)
 
-    collision_index = world.player_ghost_collision()
+    collision_index = world.player_ghost_collision(
+        (3, 3), [(0, 0), (6, 0), (0, 6), (6, 6)]
+    )
 
     assert collision_index is None

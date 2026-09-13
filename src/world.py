@@ -1,6 +1,8 @@
 from src.contracts import LevelData, Position
 from src.contracts import WorldEvent
 
+COLLISION_DISTANCE = 0.5
+
 
 class World:
     def __init__(
@@ -27,8 +29,13 @@ class World:
             return tuple(events)
         return tuple(events)
 
-    def player_ghost_collision(self) -> int | None:
-        for ghost_index, ghost in enumerate(self.ghosts):
-            if self.player_position == ghost:
+    def player_ghost_collision(
+        self,
+        player_render_position: tuple[float, float],
+        ghost_render_positions: list[tuple[float, float]],
+    ) -> int | None:
+        px, py = player_render_position
+        for ghost_index, (gx, gy) in enumerate(ghost_render_positions):
+            if abs(px - gx) <= COLLISION_DISTANCE and abs(py - gy) <= COLLISION_DISTANCE:
                 return ghost_index
         return None

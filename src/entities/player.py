@@ -10,7 +10,7 @@ class Player:
     spawn: Position
     lives: int
     progress: float = 0.0
-    speed: float = 6.0
+    speed: float = 6.4
     facing: Direction = Direction.NONE
 
     def request_direction(self, direction: Direction) -> None:
