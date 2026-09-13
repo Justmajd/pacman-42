@@ -106,6 +106,14 @@ def test_pause_screen_resume_returns_to_playing() -> None:
     assert result == GameState.PLAYING
 
 
+def test_pause_screen_escape_resumes_playing() -> None:
+    screen = PauseScreen(menu=Menu(options=["Resume", "Main Menu"]))
+
+    result = screen.handle_event(key_event(pygame.K_ESCAPE))
+
+    assert result == GameState.PLAYING
+
+
 def test_pause_screen_main_menu_option() -> None:
     screen = PauseScreen(menu=Menu(options=["Resume", "Main Menu"]))
     screen.handle_event(key_event(pygame.K_DOWN))

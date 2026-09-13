@@ -238,7 +238,7 @@ def run_app(config: GameConfig) -> int:
                     else:
                         for event in events:
                             if event.type == pygame.KEYDOWN:
-                                if event.key == pygame.K_p:
+                                if event.key == pygame.K_ESCAPE and state == GameState.PLAYING:
                                     pause_screen.capture_background(
                                         renderer.screen
                                     )
@@ -249,6 +249,8 @@ def run_app(config: GameConfig) -> int:
                                         player.request_direction(
                                             direction=direction
                                         )
+                        if state == GameState.PAUSED:
+                            continue
                         player.update(grid=grid, dt=dt)
                         phase_time_remaining -= dt
                         if phase_time_remaining <= 0:

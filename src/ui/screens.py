@@ -79,9 +79,9 @@ class PauseScreen:
     def handle_event(self, event):
         if event.type != pygame.KEYDOWN:
             return None
-
+        if event.key == pygame.K_ESCAPE:
+            return GameState.PLAYING
         direction = key_to_direction(event.key)
-
         if direction == Direction.UP:
             self.menu.move_up()
         if direction == Direction.DOWN:
