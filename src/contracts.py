@@ -86,3 +86,4 @@ class GameSnapshot:
     time: float
     level_start_countdown: float
     level_cleared: bool
+    hide_ghosts: bool

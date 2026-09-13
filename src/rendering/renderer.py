@@ -310,7 +310,7 @@ class Renderer:
                 continue
             if snapshot.player_is_dying:
                 continue
-            if snapshot.level_cleared:
+            if snapshot.hide_ghosts:
                 continue
 
             interp_x, interp_y = ghost.position

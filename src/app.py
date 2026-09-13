@@ -98,6 +98,7 @@ def run_app(config: GameConfig) -> int:
     player_is_dying = False
     is_scattering = True
     phase_time_remaining = SCATTER_DURATION
+    displayed_level = session.level
 
     state = GameState.MENU
     pending_state: GameState | None = None
@@ -119,7 +120,7 @@ def run_app(config: GameConfig) -> int:
         nonlocal session, level_data, grid, world, player, ghosts
         nonlocal level_start_countdown, respawn_freeze, game_over_freeze
         nonlocal level_clear_hold, player_is_dying
-        nonlocal is_scattering, phase_time_remaining
+        nonlocal is_scattering, phase_time_remaining, displayed_level
         session = GameSession(config=config)
         level_data = provider.build_level(1, config.seed)
         grid, world, player, ghosts = _create_level_runtime(
@@ -134,6 +135,7 @@ def run_app(config: GameConfig) -> int:
         player_is_dying = False
         is_scattering = True
         phase_time_remaining = SCATTER_DURATION
+        displayed_level = session.level
 
     def render_current(target_state: GameState) -> None:
         if target_state == GameState.MENU:
@@ -165,6 +167,7 @@ def run_app(config: GameConfig) -> int:
                 level_start_countdown = LEVEL_START_COUNTDOWN_DURATION
                 is_scattering = True
                 phase_time_remaining = SCATTER_DURATION
+                displayed_level = session.level
             if new_game_pending and was_covering and not transition.covering:
                 new_game_pending = False
                 start_new_game()
@@ -315,10 +318,12 @@ def run_app(config: GameConfig) -> int:
                 elif session.state == GameState.GAME_OVER:
                     game_over_freeze -= dt
                     if game_over_freeze <= 0:
+                        game_over_screen.reset()
                         state = GameState.GAME_OVER
                 elif session.state == GameState.VICTORY:
                     level_clear_hold -= dt
                     if level_clear_hold <= 0:
+                        victory_screen.reset()
                         state = GameState.VICTORY
 
         ghosts_state: list[GhostState] = []
@@ -350,13 +355,14 @@ def run_app(config: GameConfig) -> int:
             ghosts_state[2],
             ghosts_state[3],
         )
-        level_cleared_display = (
+        hide_ghosts_display = (
             level_clear_hold > 0
             or (transition is not None and pending_state is None)
         )
         game_snapshot = GameSnapshot(
             level_start_countdown=level_start_countdown,
-            level_cleared=level_cleared_display,
+            level_cleared=(level_clear_hold > 0),
+            hide_ghosts=hide_ghosts_display,
             player_pos=player.render_position(),
             player_direction=player.facing,
             player_is_dying=player_is_dying,
@@ -365,7 +371,7 @@ def run_app(config: GameConfig) -> int:
             super_pacgums=frozenset(world.super_pacgums),
             ghosts=ghost_state_tuple,
             score=session.score,
-            level=session.level,
+            level=displayed_level,
             lives=session.lives,
             time=session.level_time_remaining,
         )

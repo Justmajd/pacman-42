@@ -56,6 +56,8 @@ def make_snapshot(**overrides: object) -> GameSnapshot:
         level=1,
         time=90.0,
         level_start_countdown=0.0,
+        level_cleared=False,
+        hide_ghosts=False,
     )
     defaults.update(overrides)
     return GameSnapshot(**cast(Any, defaults))
@@ -114,10 +116,10 @@ def test_player_position_maps_to_correct_pixel_no_xy_swap() -> None:
         pygame.draw.rect = real_rect
 
     first_player_rect = rect_calls[0]
-    expected_x_min = 2 * renderer.tile_size
-    expected_x_max = 3 * renderer.tile_size
-    expected_y_min = renderer.top_strip
-    expected_y_max = renderer.top_strip + renderer.tile_size
+    expected_x_min = renderer.left_margin + 2 * renderer.tile_size
+    expected_x_max = renderer.left_margin + 3 * renderer.tile_size
+    expected_y_min = renderer.top_margin
+    expected_y_max = renderer.top_margin + renderer.tile_size
     assert expected_x_min <= first_player_rect.x < expected_x_max
     assert expected_y_min <= first_player_rect.y < expected_y_max
     renderer.cleanup()

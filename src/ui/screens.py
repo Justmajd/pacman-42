@@ -114,14 +114,31 @@ class PauseScreen:
         self.blurred_background = pygame.transform.gaussian_blur(surface, 8)
 
 
+NAME_MAX_LENGTH = 8
+
+
 @dataclass
 class GameOverScreen:
     menu: Menu
     font: pygame.font.Font = field(default_factory=lambda: pygame.font.Font(FONT_PATH, 20))
     title_font: pygame.font.Font = field(default_factory=lambda: pygame.font.Font(FONT_PATH, 56))
+    name: str = ""
+    entering_name: bool = True
 
     def handle_event(self, event):
         if event.type != pygame.KEYDOWN:
+            return None
+
+        if self.entering_name:
+            if event.key == pygame.K_RETURN and self.name:
+                self.entering_name = False
+            elif event.key in (pygame.K_RETURN, pygame.K_ESCAPE):
+                self.name = ""
+                self.entering_name = False
+            elif event.key == pygame.K_BACKSPACE:
+                self.name = self.name[:-1]
+            elif event.unicode.isalnum() and len(self.name) < NAME_MAX_LENGTH:
+                self.name += event.unicode.upper()
             return None
 
         direction = key_to_direction(event.key)
@@ -137,6 +154,10 @@ class GameOverScreen:
             elif option == "Main Menu":
                 return GameState.MENU
 
+    def reset(self):
+        self.name = ""
+        self.entering_name = True
+
     def render(self, screen, score):
         screen.fill((0, 0, 0))
 
@@ -149,6 +170,18 @@ class GameOverScreen:
         score_x = (screen.get_width() - score_surface.get_width()) // 2
         score_y = title_y + title_surface.get_height() + 40
         screen.blit(score_surface, (score_x, score_y))
+
+        if self.entering_name:
+            prompt_surface = self.font.render("ENTER YOUR NAME", True, (255, 255, 255))
+            prompt_x = (screen.get_width() - prompt_surface.get_width()) // 2
+            prompt_y = score_y + 80
+            screen.blit(prompt_surface, (prompt_x, prompt_y))
+
+            name_surface = self.font.render(self.name + "_", True, (255, 255, 0))
+            name_x = (screen.get_width() - name_surface.get_width()) // 2
+            name_y = prompt_y + 40
+            screen.blit(name_surface, (name_x, name_y))
+            return
 
         menu_start_y = score_y + 80
         for index, label in enumerate(self.menu.options):
@@ -167,9 +200,23 @@ class VictoryScreen:
     menu: Menu
     font: pygame.font.Font = field(default_factory=lambda: pygame.font.Font(FONT_PATH, 20))
     title_font: pygame.font.Font = field(default_factory=lambda: pygame.font.Font(FONT_PATH, 48))
+    name: str = ""
+    entering_name: bool = True
 
     def handle_event(self, event):
         if event.type != pygame.KEYDOWN:
+            return None
+
+        if self.entering_name:
+            if event.key == pygame.K_RETURN and self.name:
+                self.entering_name = False
+            elif event.key in (pygame.K_RETURN, pygame.K_ESCAPE):
+                self.name = ""
+                self.entering_name = False
+            elif event.key == pygame.K_BACKSPACE:
+                self.name = self.name[:-1]
+            elif event.unicode.isalnum() and len(self.name) < NAME_MAX_LENGTH:
+                self.name += event.unicode.upper()
             return None
 
         direction = key_to_direction(event.key)
@@ -185,6 +232,10 @@ class VictoryScreen:
             elif option == "Main Menu":
                 return GameState.MENU
 
+    def reset(self):
+        self.name = ""
+        self.entering_name = True
+
     def render(self, screen, score):
         screen.fill((0, 0, 0))
 
@@ -197,6 +248,18 @@ class VictoryScreen:
         score_x = (screen.get_width() - score_surface.get_width()) // 2
         score_y = title_y + title_surface.get_height() + 40
         screen.blit(score_surface, (score_x, score_y))
+
+        if self.entering_name:
+            prompt_surface = self.font.render("ENTER YOUR NAME", True, (255, 255, 255))
+            prompt_x = (screen.get_width() - prompt_surface.get_width()) // 2
+            prompt_y = score_y + 80
+            screen.blit(prompt_surface, (prompt_x, prompt_y))
+
+            name_surface = self.font.render(self.name + "_", True, (255, 255, 0))
+            name_x = (screen.get_width() - name_surface.get_width()) // 2
+            name_y = prompt_y + 40
+            screen.blit(name_surface, (name_x, name_y))
+            return
 
         menu_start_y = score_y + 80
         for index, label in enumerate(self.menu.options):
