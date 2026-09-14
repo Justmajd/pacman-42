@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from pathlib import Path
 import json
+import os
+
 def is_valid_name(name) -> bool:
     if not name:
         return False
@@ -54,13 +56,49 @@ def load_highscores(path: str) -> list[HighscoreEntry]:
     file_path = Path(path)
     if not file_path.exists():
         return []
-    final_format = {}
-    with open(file=path, mode='r+') as score_file:
-        content = score_file.read()
-        if len(content.strip()) == 0:
+    final_format = []
+    with open(file=path, mode='r', encoding="utf-8") as score_file:
+        try:
+            formatted_json: list[dict] = json.load(score_file)
+        except json.JSONDecodeError:
             return []
-        final_format: list[dict] = json.load(content)
-    names = validate_name(final_format)
-    scores = validate_score(final_format)
-    
+        if not isinstance(formatted_json, list):
+            return []
+        final_format = []
+        for x in formatted_json:
+            if isinstance(x, dict):
+              final_format.append(x)  
+        final_list = []
+    for _ in final_format:
+        try:    
+            name = validate_name(_["name"])
+            score = validate_score(_["score"])
+        except ValueError:
+            continue
+        except KeyError:
+            continue
+        entry :HighscoreEntry = HighscoreEntry(name=name, score=score)
+        final_list.append(entry)
+    final_list = normalize_entries(final_list)
+    return final_list
 
+def save_highscores(
+    path: str,
+    entries: list[HighscoreEntry],
+) -> None:
+    temp_list = []
+    for entry in entries:  
+        name = validate_name(entry.name)
+        score = validate_score(entry.score)
+        entry :HighscoreEntry = HighscoreEntry(name=name, score=score)
+        temp_list.append(entry)
+    normalized_entries = normalize_entries(temp_list)
+    final_list = []
+    for _ in normalized_entries:
+        temp_dict = {"name": _.name, "score": _.score}
+        final_list.append(temp_dict)
+    file_path = Path(path)
+    temp_path = file_path.with_name(file_path.name + ".tmp")
+    with open(file=temp_path, mode='w', encoding="utf-8") as score_file:
+        json.dump(final_list,score_file)
+    os.replace(temp_path, file_path)
