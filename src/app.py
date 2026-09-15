@@ -27,8 +27,10 @@ from src.ui.screens import (
     PauseScreen,
     Transition,
     VictoryScreen,
+    HighscoreScreen,
 )
 from src.world import World
+from src.highscore import load_highscores, save_highscores,HighscoreEntry
 
 SCATTER_DURATION = 7.0
 CHASE_DURATION = 20.0
@@ -112,6 +114,7 @@ def run_app(config: GameConfig) -> int:
     pause_screen = PauseScreen(menu=Menu(options=["Resume", "Main Menu"]))
     game_over_screen = GameOverScreen(menu=Menu(options=["Retry", "Main Menu"]))
     victory_screen = VictoryScreen(menu=Menu(options=["Retry", "Main Menu"]))
+    highscore_screen = HighscoreScreen(entries=[])
 
     renderer.load_level(level_data=level_data)
     game_snapshot: GameSnapshot | None = None
@@ -148,6 +151,9 @@ def run_app(config: GameConfig) -> int:
             game_over_screen.render(renderer.screen, session.score)
         elif target_state == GameState.VICTORY:
             victory_screen.render(renderer.screen, session.score)
+        elif target_state == GameState.HIGHSCORES:
+            highscore_screen.render(renderer.screen)
+        
 
     while renderer.is_running:
         dt = renderer.tick()
@@ -186,6 +192,10 @@ def run_app(config: GameConfig) -> int:
                         new_game_pending = True
                         pending_state = GameState.PLAYING
                         transition = Transition()
+                    elif next_state == GameState.HIGHSCORES:
+                        menu_highscores = load_highscores(config.highscore_filename)
+                        highscore_screen.entries = menu_highscores
+                        state = GameState.HIGHSCORES
             elif state == GameState.PAUSED:
                 for event in events:
                     next_state = pause_screen.handle_event(event)
@@ -194,9 +204,20 @@ def run_app(config: GameConfig) -> int:
                     if next_state == GameState.MENU:
                         pending_state = GameState.MENU
                         transition = Transition()
+            elif state == GameState.HIGHSCORES:
+                for event in events:
+                    next_state = highscore_screen.handle_event(event)
+                    if next_state == GameState.MENU:
+                        state = GameState.MENU 
             elif state == GameState.GAME_OVER:
                 for event in events:
+                    entering_name = game_over_screen.entering_name
                     next_state = game_over_screen.handle_event(event)
+                    if entering_name == True and game_over_screen.entering_name == False and len(game_over_screen.name) > 0 :
+                        highscores = load_highscores(config.highscore_filename)
+                        new_highscore :HighscoreEntry = HighscoreEntry(name=game_over_screen.name, score=session.score)
+                        highscores.append(new_highscore)
+                        save_highscores(path=config.highscore_filename, entries=highscores)
                     if next_state == GameState.PLAYING:
                         new_game_pending = True
                         pending_state = GameState.PLAYING
@@ -206,7 +227,13 @@ def run_app(config: GameConfig) -> int:
                         transition = Transition()
             elif state == GameState.VICTORY:
                 for event in events:
+                    entering_name = victory_screen.entering_name
                     next_state = victory_screen.handle_event(event)
+                    if entering_name == True and victory_screen.entering_name == False and len(victory_screen.name) > 0 :
+                        highscores = load_highscores(config.highscore_filename)
+                        new_highscore :HighscoreEntry = HighscoreEntry(name=victory_screen.name, score=session.score)
+                        highscores.append(new_highscore)
+                        save_highscores(path=config.highscore_filename, entries=highscores)
                     if next_state == GameState.PLAYING:
                         new_game_pending = True
                         pending_state = GameState.PLAYING
