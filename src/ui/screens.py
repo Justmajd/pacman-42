@@ -3,6 +3,8 @@ from src.contracts import GameState, Direction
 from src.ui.menu import Menu
 from src.input import key_to_direction
 from src.rendering.shapes import PACMAN_TRANSITION, PACMAN_RIGHT
+from src.highscore import HighscoreEntry, save_highscores, load_highscores
+from src.config import GameConfig
 import pygame
 
 FONT_PATH = "assets/fonts/PressStart2P.ttf"
@@ -114,7 +116,7 @@ class PauseScreen:
         self.blurred_background = pygame.transform.gaussian_blur(surface, 8)
 
 
-NAME_MAX_LENGTH = 8
+NAME_MAX_LENGTH = 10
 
 
 @dataclass
@@ -124,20 +126,19 @@ class GameOverScreen:
     title_font: pygame.font.Font = field(default_factory=lambda: pygame.font.Font(FONT_PATH, 56))
     name: str = ""
     entering_name: bool = True
-
     def handle_event(self, event):
         if event.type != pygame.KEYDOWN:
             return None
 
         if self.entering_name:
-            if event.key == pygame.K_RETURN and self.name:
+            if event.key == pygame.K_RETURN and self.name and not self.name.isspace():
                 self.entering_name = False
-            elif event.key in (pygame.K_RETURN, pygame.K_ESCAPE):
+            elif event.key == pygame.K_ESCAPE:
                 self.name = ""
                 self.entering_name = False
             elif event.key == pygame.K_BACKSPACE:
                 self.name = self.name[:-1]
-            elif event.unicode.isalnum() and len(self.name) < NAME_MAX_LENGTH:
+            elif (event.unicode.isalnum() or event.unicode == ' ') and len(self.name) < NAME_MAX_LENGTH:
                 self.name += event.unicode.upper()
             return None
 
@@ -208,9 +209,9 @@ class VictoryScreen:
             return None
 
         if self.entering_name:
-            if event.key == pygame.K_RETURN and self.name:
+            if event.key == pygame.K_RETURN and self.name and not self.name.isspace():
                 self.entering_name = False
-            elif event.key in (pygame.K_RETURN, pygame.K_ESCAPE):
+            elif event.key == pygame.K_ESCAPE:
                 self.name = ""
                 self.entering_name = False
             elif event.key == pygame.K_BACKSPACE:
@@ -310,4 +311,33 @@ class Transition:
                                     pygame.Rect(x1, y1,
                                                 x2 - x1,
                                                 y2 - y1))
-                    
+@dataclass
+class HighscoreScreen:
+    entries :list[HighscoreEntry]
+    font: pygame.font.Font = field(default_factory=lambda: pygame.font.Font(FONT_PATH, 20))
+    title_font: pygame.font.Font = field(default_factory=lambda: pygame.font.Font(FONT_PATH, 56))
+
+    def handle_event(self, event):
+        if event.type != pygame.KEYDOWN:
+            return None
+
+        if event.key == pygame.K_ESCAPE:
+            return GameState.MENU
+
+    def render(self, screen):
+        rank = 1
+        screen.fill((0,0,0))
+        title_surface = self.title_font.render("HIGHSCORES", True, (255,255,0))
+        title_x = (screen.get_width()-title_surface.get_width()) // 2
+        screen.blit(title_surface,(title_x,100))
+        player_y = 220
+        for entry in self.entries:
+            line_toprint = f"{rank}. {entry.name}      {entry.score}"
+            line_surface = self.font.render(line_toprint,True,(255,255,255))
+            line_x = (screen.get_width()-line_surface.get_width()) // 2
+            screen.blit(line_surface,(line_x,player_y))
+            rank += 1
+            player_y += 40
+        esc_surface = self.font.render("ESC - BACK",True,(255,255,255))
+        esc_x = (screen.get_width()-esc_surface.get_width()) // 2
+        screen.blit(esc_surface,(esc_x,screen.get_height() - 60))
