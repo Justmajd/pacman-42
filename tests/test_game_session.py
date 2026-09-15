@@ -141,6 +141,24 @@ def test_lives_do_not_go_below_zero() -> None:
     assert session.state == GameState.GAME_OVER
 
 
+def test_add_lives_only_changes_lives() -> None:
+    session = GameSession(make_config(lives=2))
+    session.score = 500
+    session.level = 3
+    session.level_time_remaining = 42.0
+    session.frightened_time_remaining = 1.5
+    session.state = GameState.PLAYING
+
+    session.add_lives(2)
+
+    assert session.lives == 4
+    assert session.score == 500
+    assert session.level == 3
+    assert session.level_time_remaining == 42.0
+    assert session.frightened_time_remaining == 1.5
+    assert session.state == GameState.PLAYING
+
+
 def test_level_clear_advances_level_and_resets_timers() -> None:
     config = make_config(
         level_max_time=90,

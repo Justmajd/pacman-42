@@ -31,6 +31,7 @@ from src.ui.screens import (
 )
 from src.world import World
 from src.highscore import load_highscores, save_highscores,HighscoreEntry
+from src.cheat import CheatController
 
 SCATTER_DURATION = 7.0
 CHASE_DURATION = 20.0
@@ -38,6 +39,9 @@ LEVEL_START_COUNTDOWN_DURATION = 3.0
 RESPAWN_FREEZE_DURATION = 3.0
 LEVEL_CLEAR_HOLD_DURATION = 2.0
 GAME_OVER_FREEZE_DURATION = 2.0
+PLAYER_BASE_SPEED = 6.4
+SPEED_BOOST_MULTIPLIER = 1.5
+EXTRA_LIVES_GRANTED = 1
 
 
 def _scatter_corners(width: int, height: int) -> dict[int, Position]:
@@ -115,6 +119,7 @@ def run_app(config: GameConfig) -> int:
     game_over_screen = GameOverScreen(menu=Menu(options=["Retry", "Main Menu"]))
     victory_screen = VictoryScreen(menu=Menu(options=["Retry", "Main Menu"]))
     highscore_screen = HighscoreScreen(entries=[])
+    cheat_controller = CheatController()
 
     renderer.load_level(level_data=level_data)
     game_snapshot: GameSnapshot | None = None
@@ -264,6 +269,7 @@ def run_app(config: GameConfig) -> int:
                             player_is_dying = False
                     else:
                         for event in events:
+                            cheat_controller.handle_event(event)
                             if event.type == pygame.KEYDOWN:
                                 if event.key == pygame.K_ESCAPE and state == GameState.PLAYING:
                                     pause_screen.capture_background(
@@ -278,6 +284,11 @@ def run_app(config: GameConfig) -> int:
                                         )
                         if state == GameState.PAUSED:
                             continue
+                        player.speed = (
+                            PLAYER_BASE_SPEED * SPEED_BOOST_MULTIPLIER
+                            if cheat_controller.speed_boosted
+                            else PLAYER_BASE_SPEED
+                        )
                         player.update(grid=grid, dt=dt)
                         phase_time_remaining -= dt
                         if phase_time_remaining <= 0:
@@ -295,17 +306,18 @@ def run_app(config: GameConfig) -> int:
                                 blinky_pos,
                                 is_scattering,
                             )
-                            ghost.update(
-                                dt=dt,
-                                grid=grid,
-                                target=ghost_target,
-                                rng=rng,
-                                frightened=(
-                                    session.frightened_time_remaining > 0
-                                    and not ghost.is_eaten
-                                    and not ghost.frightened_immune
-                                ),
-                            )
+                            if not cheat_controller.ghosts_frozen:
+                                ghost.update(
+                                    dt=dt,
+                                    grid=grid,
+                                    target=ghost_target,
+                                    rng=rng,
+                                    frightened=(
+                                        session.frightened_time_remaining > 0
+                                        and not ghost.is_eaten
+                                        and not ghost.frightened_immune
+                                    ),
+                                )
                         world.player_position = player.position
                         world.ghosts = [ghost.position for ghost in ghosts]
                         consumable = world.consume_pickup()
@@ -316,6 +328,12 @@ def run_app(config: GameConfig) -> int:
                             if world_event == WorldEvent.SUPER_PACGUM_EATEN:
                                 for ghost in ghosts:
                                     ghost.frightened_immune = False
+                        if cheat_controller.consume_level_skip_request():
+                            world.clear_pickups()
+                            session.handle_event(WorldEvent.LEVEL_CLEARED)
+                            level_clear_hold = LEVEL_CLEAR_HOLD_DURATION
+                        if cheat_controller.consume_extra_life_request():
+                            session.add_lives(EXTRA_LIVES_GRANTED)
                         if level_clear_hold <= 0:
                             collision_index = world.player_ghost_collision(
                                 player.render_position(),
@@ -334,6 +352,8 @@ def run_app(config: GameConfig) -> int:
                                     )
                                     collided_ghost.is_eaten = True
                                     collided_ghost.frightened_immune = True
+                                elif cheat_controller.invincible:
+                                    pass
                                 else:
                                     session.handle_event(WorldEvent.PLAYER_HIT)
                                     player_is_dying = True
@@ -388,10 +408,19 @@ def run_app(config: GameConfig) -> int:
             level_clear_hold > 0
             or (transition is not None and pending_state is None)
         )
+        active_cheats = tuple(
+            label for label, active in (
+                ("INVINCIBLE", cheat_controller.invincible),
+                ("GHOSTS FROZEN", cheat_controller.ghosts_frozen),
+                ("SPEED BOOST", cheat_controller.speed_boosted),
+            ) if active
+        )
         game_snapshot = GameSnapshot(
             level_start_countdown=level_start_countdown,
             level_cleared=(level_clear_hold > 0),
             hide_ghosts=hide_ghosts_display,
+            cheats_enabled=cheat_controller.enabled,
+            active_cheats=active_cheats,
             player_pos=player.render_position(),
             player_direction=player.facing,
             player_is_dying=player_is_dying,

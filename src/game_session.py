@@ -13,6 +13,9 @@ class GameSession:
         self.state: GameState = GameState.PLAYING
         self.config = config
 
+    def add_lives(self, amount: int) -> None:
+        self.lives += amount
+
     def update(self, dt: float) -> None:
         if self.state == GameState.PLAYING:
             self.level_time_remaining -= dt
