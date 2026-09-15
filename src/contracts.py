@@ -87,3 +87,5 @@ class GameSnapshot:
     level_start_countdown: float
     level_cleared: bool
     hide_ghosts: bool
+    cheats_enabled: bool
+    active_cheats: tuple[str, ...]

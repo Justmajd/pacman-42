@@ -58,6 +58,8 @@ def make_snapshot(**overrides: object) -> GameSnapshot:
         level_start_countdown=0.0,
         level_cleared=False,
         hide_ghosts=False,
+        cheats_enabled=False,
+        active_cheats=(),
     )
     defaults.update(overrides)
     return GameSnapshot(**cast(Any, defaults))

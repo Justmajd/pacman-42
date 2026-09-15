@@ -463,6 +463,11 @@ class Renderer:
         y = lives_center[1] - (lives_surface.get_height() // 2)
         self.screen.blit(lives_surface, (x, y))
 
+        if snapshot.cheats_enabled:
+            cheat_text = " ".join(("CHEAT MODE",) + snapshot.active_cheats)
+            cheat_surface = self.font.render(cheat_text, True, (255, 60, 60))
+            self.screen.blit(cheat_surface, (10, 30))
+
     def cleanup(self) -> None:
         pygame.quit()
 

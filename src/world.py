@@ -15,6 +15,10 @@ class World:
         self.player_position = level.player_spawn
         self.ghosts: list[Position] = list(level.ghost_spawns)
 
+    def clear_pickups(self) -> None:
+        self.pacgums.clear()
+        self.super_pacgums.clear()
+
     def consume_pickup(self) -> tuple[WorldEvent, ...]:
         events: list[WorldEvent] = []
         if self.player_position in self.pacgums:
