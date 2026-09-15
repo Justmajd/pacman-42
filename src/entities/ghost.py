@@ -12,7 +12,7 @@ class Ghost:
     active: bool
     respawn_delay: float
     progress: float = 0.0
-    speed: float = 6.0
+    speed: float = 3.0
     ghost_id: int = 0
     scatter_target: Position = (0, 0)
     is_eaten: bool = False

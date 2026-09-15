@@ -464,9 +464,18 @@ class Renderer:
         self.screen.blit(lives_surface, (x, y))
 
         if snapshot.cheats_enabled:
-            cheat_text = " ".join(("CHEAT MODE",) + snapshot.active_cheats)
-            cheat_surface = self.font.render(cheat_text, True, (255, 60, 60))
-            self.screen.blit(cheat_surface, (10, 30))
+            header_surface = self.font.render("CHEAT MODE", True, (0, 255, 0))
+            self.screen.blit(header_surface, (10, 30))
+            for index, (label, key, active) in enumerate(snapshot.cheats):
+                if label in ("EXTRA LIFE", "LEVEL SKIP"):
+                    cheat_text = f"{key}: {label}"
+                    color = (255, 255, 255)
+                else:
+                    status = "ON" if active else "OFF"
+                    color = (0, 255, 0) if active else (255, 60, 60)
+                    cheat_text = f"{key}: {label} {status}"
+                cheat_surface = self.font.render(cheat_text, True, color)
+                self.screen.blit(cheat_surface, (10, 50 + index * 20))
 
     def cleanup(self) -> None:
         pygame.quit()

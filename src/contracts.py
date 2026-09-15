@@ -71,6 +71,9 @@ class GhostState:
     is_eaten: bool
 
 
+CheatDisplay = tuple[str, str, bool]
+
+
 @dataclass(frozen=True)
 class GameSnapshot:
     player_pos: RenderPosition
@@ -88,4 +91,4 @@ class GameSnapshot:
     level_cleared: bool
     hide_ghosts: bool
     cheats_enabled: bool
-    active_cheats: tuple[str, ...]
+    cheats: tuple[CheatDisplay, ...]

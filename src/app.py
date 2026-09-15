@@ -408,19 +408,19 @@ def run_app(config: GameConfig) -> int:
             level_clear_hold > 0
             or (transition is not None and pending_state is None)
         )
-        active_cheats = tuple(
-            label for label, active in (
-                ("INVINCIBLE", cheat_controller.invincible),
-                ("GHOSTS FROZEN", cheat_controller.ghosts_frozen),
-                ("SPEED BOOST", cheat_controller.speed_boosted),
-            ) if active
+        cheats = (
+            ("INVINCIBLE", "F1", cheat_controller.invincible),
+            ("GHOSTS FROZEN", "F2", cheat_controller.ghosts_frozen),
+            ("EXTRA LIFE", "F3", False),
+            ("SPEED BOOST", "F4", cheat_controller.speed_boosted),
+            ("LEVEL SKIP", "F5", False),
         )
         game_snapshot = GameSnapshot(
             level_start_countdown=level_start_countdown,
             level_cleared=(level_clear_hold > 0),
             hide_ghosts=hide_ghosts_display,
             cheats_enabled=cheat_controller.enabled,
-            active_cheats=active_cheats,
+            cheats=cheats,
             player_pos=player.render_position(),
             player_direction=player.facing,
             player_is_dying=player_is_dying,
