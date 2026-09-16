@@ -8,6 +8,7 @@ from src.contracts import GameState  # noqa: E402
 from src.ui.menu import Menu  # noqa: E402
 from src.ui.screens import (  # noqa: E402
     GameOverScreen,
+    InstructionsScreen,
     MainMenuScreen,
     PauseScreen,
     VictoryScreen,
@@ -117,6 +118,24 @@ def test_pause_screen_escape_resumes_playing() -> None:
 def test_pause_screen_main_menu_option() -> None:
     screen = PauseScreen(menu=Menu(options=["Resume", "Main Menu"]))
     screen.handle_event(key_event(pygame.K_DOWN))
+
+    result = screen.handle_event(key_event(pygame.K_RETURN))
+
+    assert result == GameState.MENU
+
+
+# --- InstructionsScreen --------------------------------------------------------
+
+def test_instructions_screen_escape_returns_to_menu() -> None:
+    screen = InstructionsScreen()
+
+    result = screen.handle_event(key_event(pygame.K_ESCAPE))
+
+    assert result == GameState.MENU
+
+
+def test_instructions_screen_enter_returns_to_menu() -> None:
+    screen = InstructionsScreen()
 
     result = screen.handle_event(key_event(pygame.K_RETURN))
 

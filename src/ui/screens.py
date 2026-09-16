@@ -312,6 +312,45 @@ class Transition:
                                                 x2 - x1,
                                                 y2 - y1))
 @dataclass
+class InstructionsScreen:
+    font: pygame.font.Font = field(default_factory=lambda: pygame.font.Font(FONT_PATH, 20))
+    title_font: pygame.font.Font = field(default_factory=lambda: pygame.font.Font(FONT_PATH, 56))
+
+    def handle_event(self, event):
+        if event.type != pygame.KEYDOWN:
+            return None
+
+        if event.key in (pygame.K_ESCAPE, pygame.K_RETURN):
+            return GameState.MENU
+
+    def render(self, screen):
+        screen.fill((0, 0, 0))
+
+        title_surface = self.title_font.render("INSTRUCTIONS", True, (255, 255, 0))
+        title_x = (screen.get_width() - title_surface.get_width()) // 2
+        screen.blit(title_surface, (title_x, 100))
+
+        lines = (
+            "MOVE WITH ARROWS OR WASD",
+            "EAT ALL PACGUMS TO CLEAR A LEVEL",
+            "AVOID GHOSTS UNTIL YOU HAVE POWER",
+            "POWER PELLETS LET YOU EAT GHOSTS",
+            "PRESS ESC TO PAUSE AT ANY TIME",
+        )
+
+        start_y = 220
+        for line in lines:
+            line_surface = self.font.render(line, True, (255, 255, 255))
+            line_x = (screen.get_width() - line_surface.get_width()) // 2
+            screen.blit(line_surface, (line_x, start_y))
+            start_y += 42
+
+        back_surface = self.font.render("ESC / ENTER - BACK", True, (255, 255, 255))
+        back_x = (screen.get_width() - back_surface.get_width()) // 2
+        screen.blit(back_surface, (back_x, screen.get_height() - 60))
+
+
+@dataclass
 class HighscoreScreen:
     entries :list[HighscoreEntry]
     font: pygame.font.Font = field(default_factory=lambda: pygame.font.Font(FONT_PATH, 20))

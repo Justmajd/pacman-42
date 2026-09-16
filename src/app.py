@@ -23,11 +23,12 @@ from src.rendering.renderer import Renderer
 from src.ui.menu import Menu
 from src.ui.screens import (
     GameOverScreen,
+    HighscoreScreen,
+    InstructionsScreen,
     MainMenuScreen,
     PauseScreen,
     Transition,
     VictoryScreen,
-    HighscoreScreen,
 )
 from src.world import World
 from src.highscore import load_highscores, save_highscores,HighscoreEntry
@@ -119,6 +120,7 @@ def run_app(config: GameConfig) -> int:
     game_over_screen = GameOverScreen(menu=Menu(options=["Retry", "Main Menu"]))
     victory_screen = VictoryScreen(menu=Menu(options=["Retry", "Main Menu"]))
     highscore_screen = HighscoreScreen(entries=[])
+    instructions_screen = InstructionsScreen()
     cheat_controller = CheatController()
 
     renderer.load_level(level_data=level_data)
@@ -158,7 +160,9 @@ def run_app(config: GameConfig) -> int:
             victory_screen.render(renderer.screen, session.score)
         elif target_state == GameState.HIGHSCORES:
             highscore_screen.render(renderer.screen)
-        
+        elif target_state == GameState.INSTRUCTIONS:
+            instructions_screen.render(renderer.screen)
+
 
     while renderer.is_running:
         dt = renderer.tick()
@@ -201,6 +205,8 @@ def run_app(config: GameConfig) -> int:
                         menu_highscores = load_highscores(config.highscore_filename)
                         highscore_screen.entries = menu_highscores
                         state = GameState.HIGHSCORES
+                    elif next_state == GameState.INSTRUCTIONS:
+                        state = GameState.INSTRUCTIONS
             elif state == GameState.PAUSED:
                 for event in events:
                     next_state = pause_screen.handle_event(event)
@@ -213,7 +219,12 @@ def run_app(config: GameConfig) -> int:
                 for event in events:
                     next_state = highscore_screen.handle_event(event)
                     if next_state == GameState.MENU:
-                        state = GameState.MENU 
+                        state = GameState.MENU
+            elif state == GameState.INSTRUCTIONS:
+                for event in events:
+                    next_state = instructions_screen.handle_event(event)
+                    if next_state == GameState.MENU:
+                        state = GameState.MENU
             elif state == GameState.GAME_OVER:
                 for event in events:
                     entering_name = game_over_screen.entering_name
