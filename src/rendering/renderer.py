@@ -167,6 +167,7 @@ class Renderer:
             snapshot.level_cleared
             and (pygame.time.get_ticks() // 200) % 2 == 0
         ):
+            assert self.background_surface_white is not None
             self.screen.blit(self.background_surface_white, (0, 0))
         else:
             self.screen.blit(self.background_surface, (0, 0))

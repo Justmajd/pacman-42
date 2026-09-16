@@ -1,5 +1,4 @@
 flake8
 mypy
-pytest
 pygame-ce==2.5.8
 pyinstaller==6.22.3
