@@ -139,7 +139,7 @@ def test_factory_receives_dimensions_mode_and_resolved_seed() -> None:
 
     assert calls == [
         ((7, 7), False, 42),
-        ((7, 7), False, 124),
+        ((7, 7), False, None),
     ]
 
 
@@ -355,3 +355,19 @@ def test_validation_rejects_disconnected_or_overlapping_level_data() -> None:
     )
     with pytest.raises(ValueError, match="cover every reachable"):
         validate_level_data(missing_pickup)
+
+def test_generator_runtime_error_becomes_value_error() -> None:
+    config = make_config()
+
+    def failing_factory(
+        *,
+        size: tuple[int, int],
+        perfect: bool,
+        seed: int | None,
+    ) -> FakeMazeGenerator:
+        raise RuntimeError("package exploded")
+
+    provider = MazeGeneratorProvider(config, failing_factory)
+
+    with pytest.raises(ValueError, match="failed to generate a maze"):
+        provider.build_level(1, config.seed)

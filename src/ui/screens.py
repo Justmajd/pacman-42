@@ -216,7 +216,7 @@ class VictoryScreen:
                 self.entering_name = False
             elif event.key == pygame.K_BACKSPACE:
                 self.name = self.name[:-1]
-            elif event.unicode.isalnum() and len(self.name) < NAME_MAX_LENGTH:
+            elif (event.unicode.isalnum() or event.unicode == " ")and len(self.name) < NAME_MAX_LENGTH:
                 self.name += event.unicode.upper()
             return None
 

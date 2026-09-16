@@ -22,6 +22,10 @@ def main() -> int:
     except KeyboardInterrupt:
         pygame.quit()
         print("Game interrupted.")
+        return 0 
+    except ValueError as e:
+        pygame.quit()
+        print({e})
         return 0
 
 

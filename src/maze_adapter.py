@@ -6,7 +6,6 @@ from mazegenerator import MazeGenerator
 from src.config import GameConfig
 from src.contracts import LevelData, Position
 
-
 NORTH = 1
 EAST = 2
 SOUTH = 4
@@ -312,7 +311,7 @@ class MazeGeneratorProvider:
             raise ValueError(
                 f"Seed must be an int or None, got {seed!r}"
             )
-        return seed + level_number - 1
+        return None
 
     @overload
     def build_level(self, level_number: int) -> LevelData:
@@ -351,22 +350,26 @@ class MazeGeneratorProvider:
             raise ValueError(
                 f"Seed must be an int or None, got {seed!r}"
             )
-
         resolved_seed = self._resolve_seed(base_seed, level_number)
-        generator = self.generator_factory(
-            size=(width, height),
-            perfect=False,
-            seed=resolved_seed,
-        )
-
-        walls = _validate_wall_grid(width, height, generator.maze)
+        try:
+            generator = self.generator_factory(
+                size=(width, height),
+                perfect=False,
+                seed=resolved_seed,
+            )
+            raw_maze = generator.maze
+            raw_maze_entry = generator.maze_entry
+            raw_maze_exit = generator.maze_exit
+        except RuntimeError as e:
+            raise ValueError(f"failed to generate a maze : {e}") from e
+        walls = _validate_wall_grid(width, height, raw_maze)
         maze_entry = _validate_coordinate(
-            generator.maze_entry,
+            raw_maze_entry,
             "maze_entry",
             width,
             height,
         )
-        _validate_coordinate(generator.maze_exit, "maze_exit", width, height)
+        _validate_coordinate(raw_maze_exit, "maze_exit", width, height)
 
         if walls[maze_entry[1]][maze_entry[0]] == 15:
             raise ValueError(

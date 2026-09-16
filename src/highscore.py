@@ -57,11 +57,9 @@ def load_highscores(path: str) -> list[HighscoreEntry]:
     if not file_path.exists():
         return []
     final_format = []
-    with open(file=path, mode='r', encoding="utf-8") as score_file:
-        try:
+    try:
+        with open(file=path, mode='r', encoding="utf-8") as score_file:
             formatted_json: list[dict] = json.load(score_file)
-        except json.JSONDecodeError:
-            return []
         if not isinstance(formatted_json, list):
             return []
         final_format = []
@@ -69,6 +67,11 @@ def load_highscores(path: str) -> list[HighscoreEntry]:
             if isinstance(x, dict):
               final_format.append(x)  
         final_list = []
+    except json.JSONDecodeError:
+        return []
+    except OSError:
+        return []
+
     for _ in final_format:
         try:    
             name = validate_name(_["name"])

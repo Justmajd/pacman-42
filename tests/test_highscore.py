@@ -320,3 +320,16 @@ def test_save_replaces_existing_file(tmp_path) -> None:
         HighscoreEntry("MAJD", 500),
         HighscoreEntry("OMAR", 300),
     ]
+def test_load_highscores_returns_empty_list_on_os_error(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    path = tmp_path / "highscores.json"
+    path.write_text("[]", encoding="utf-8")
+
+    def failing_open(*args, **kwargs):
+        raise PermissionError("permission denied")
+
+    monkeypatch.setattr("builtins.open", failing_open)
+
+    assert load_highscores(str(path)) == []

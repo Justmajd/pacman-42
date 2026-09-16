@@ -196,12 +196,12 @@ def test_game_over_screen_cancel_clears_name_and_reveals_menu() -> None:
     assert screen.name == ""
 
 
-def test_game_over_screen_enter_on_empty_name_acts_like_cancel() -> None:
+def test_game_over_screen_enter_on_empty_name_keeps_name_entry() -> None:
     screen = GameOverScreen(menu=Menu(options=["Retry", "Main Menu"]))
 
     screen.handle_event(key_event(pygame.K_RETURN))
 
-    assert screen.entering_name is False
+    assert screen.entering_name is True
     assert screen.name == ""
 
 
