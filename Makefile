@@ -27,7 +27,4 @@ lint-strict:
 	flake8 .
 	mypy . --strict
 
-test:
-	python3 -m pytest
-
 .PHONY: install run debug clean lint lint-strict test
