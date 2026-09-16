@@ -31,7 +31,8 @@ def test_world_copies_pickup_sets() -> None:
     assert isinstance(world.super_pacgums, set)
 
 
-def test_clear_pickups_empties_both_sets_without_touching_other_state() -> None:
+def test_clear_pickups_empties_both_sets_without_touching_other_state(
+) -> None:
     level = make_level(
         pacgums=frozenset({(1, 1), (2, 2)}),
         super_pacgums=frozenset({(3, 3)}),

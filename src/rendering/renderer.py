@@ -52,7 +52,7 @@ class Renderer:
         }
 
     def process_events(self) -> list[pygame.event.Event]:
-        events = pygame.event.get()
+        events: list[pygame.event.Event] = pygame.event.get()
 
         for event in events:
             if event.type == pygame.QUIT:
@@ -78,7 +78,8 @@ class Renderer:
 
         self.background_surface_white = pygame.Surface(self.screen.get_size())
         self.background_surface_white.fill((0, 0, 0))
-        self._draw_walls(self.background_surface_white, level_data, (255, 255, 255))
+        self._draw_walls(self.background_surface_white,
+                         level_data, (255, 255, 255))
 
     def _draw_walls(
         self,
@@ -162,7 +163,10 @@ class Renderer:
     def render(self, snapshot: GameSnapshot) -> None:
         if self.background_surface is None:
             self.screen.fill((0, 0, 0))
-        elif snapshot.level_cleared and (pygame.time.get_ticks() // 200) % 2 == 0:
+        elif (
+            snapshot.level_cleared
+            and (pygame.time.get_ticks() // 200) % 2 == 0
+        ):
             self.screen.blit(self.background_surface_white, (0, 0))
         else:
             self.screen.blit(self.background_surface, (0, 0))
@@ -246,8 +250,10 @@ class Renderer:
             frame_index = min(elapsed // 100, len(PACMAN_GAMEOVER) - 1)
             sprite_to_draw = PACMAN_GAMEOVER[frame_index]
             pixel_size = self.tile_size // 14
-            sprite_x = pixel_x + (self.tile_size - pixel_size * len(sprite_to_draw[0])) // 2
-            sprite_y = pixel_y + (self.tile_size - pixel_size * len(sprite_to_draw)) // 2
+            sprite_x = pixel_x + \
+                (self.tile_size - pixel_size * len(sprite_to_draw[0])) // 2
+            sprite_y = pixel_y + \
+                (self.tile_size - pixel_size * len(sprite_to_draw)) // 2
 
             for row_idx, row in enumerate(sprite_to_draw):
                 for col_idx, cell in enumerate(row):
@@ -288,8 +294,10 @@ class Renderer:
                     sprite_to_draw = half_open
 
             pixel_size = self.tile_size // 14
-            sprite_x = pixel_x + (self.tile_size - pixel_size * len(sprite_to_draw)) // 2
-            sprite_y = pixel_y + (self.tile_size - pixel_size * len(sprite_to_draw)) // 2
+            sprite_x = pixel_x + \
+                (self.tile_size - pixel_size * len(sprite_to_draw)) // 2
+            sprite_y = pixel_y + \
+                (self.tile_size - pixel_size * len(sprite_to_draw)) // 2
 
             for row_idx, row in enumerate(sprite_to_draw):
                 for col_idx, cell in enumerate(row):
@@ -481,6 +489,6 @@ class Renderer:
         pygame.quit()
 
     def tick(self) -> float:
-        milliseconds = self.clock.tick(60)
-        seconds = milliseconds / 1000
+        milliseconds: int = self.clock.tick(60)
+        seconds: float = milliseconds / 1000
         return seconds

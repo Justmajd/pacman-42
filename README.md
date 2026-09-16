@@ -645,7 +645,7 @@ They were used for:
 - suggesting and drafting test cases
 - reviewing highscore and maze-generation edge cases
 - drafting and reviewing project documentation, including this README
-
+- fixing all mypy and flake8 errors after finishing development
 AI assistance was used as a support and review tool. The authors remained responsible for understanding the implementation, integrating changes, testing the final behavior, and making the final project decisions.
 
 ---

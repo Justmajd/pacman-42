@@ -40,6 +40,9 @@ class World:
     ) -> int | None:
         px, py = player_render_position
         for ghost_index, (gx, gy) in enumerate(ghost_render_positions):
-            if abs(px - gx) <= COLLISION_DISTANCE and abs(py - gy) <= COLLISION_DISTANCE:
+            if (
+                abs(px - gx) <= COLLISION_DISTANCE
+                and abs(py - gy) <= COLLISION_DISTANCE
+            ):
                 return ghost_index
         return None

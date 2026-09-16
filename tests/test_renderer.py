@@ -111,7 +111,7 @@ def test_player_position_maps_to_correct_pixel_no_xy_swap() -> None:
         rect_calls.append(rect)
         return real_rect(surface, color, rect, **kwargs)
 
-    pygame.draw.rect = spy  # type: ignore[assignment]
+    pygame.draw.rect = spy
     try:
         renderer.render(make_snapshot(player_pos=(2, 0)))
     finally:
@@ -139,7 +139,7 @@ def test_ghost_colors_are_distinct() -> None:
         rect_colors.append(color)
         return real_rect(surface, color, rect, **kwargs)
 
-    pygame.draw.rect = spy  # type: ignore[assignment]
+    pygame.draw.rect = spy
     try:
         renderer.render(make_snapshot())
     finally:
@@ -163,7 +163,7 @@ def test_ghost_frightened_override_and_inactive_skipped() -> None:
         rect_colors.append(color)
         return real_rect(surface, color, rect, **kwargs)
 
-    pygame.draw.rect = spy  # type: ignore[assignment]
+    pygame.draw.rect = spy
     try:
         ghosts = (
             GhostState(id=0, position=(0, 0), direction=Direction.RIGHT,

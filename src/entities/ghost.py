@@ -23,7 +23,7 @@ class Ghost:
         Direction.DOWN: Direction.UP,
         Direction.LEFT: Direction.RIGHT,
         Direction.RIGHT: Direction.LEFT,
-        }
+    }
     CLYDE_SHY_DISTANCE = 8
     EATEN_SPEED_MULTIPLIER = 4 / 3
     FRIGHTENED_SPEED_MULTIPLIER = 2 / 3
@@ -45,7 +45,7 @@ class Ghost:
 
         if is_scattering:
             return self.scatter_target
-                
+
         if self.ghost_id == 0:
             return player_pos
 
@@ -133,7 +133,8 @@ class Ghost:
         rng: random.Random,
     ) -> Direction:
         if self.is_eaten:
-            direction = self._shortest_path_direction(grid, self.position, target)
+            direction = self._shortest_path_direction(
+                grid, self.position, target)
             if direction is not Direction.NONE:
                 return direction
         return self._pick_direction(grid, target, frightened, rng)
@@ -164,7 +165,8 @@ class Ghost:
                     current[0] + d.value[0],
                     current[1] + d.value[1],
                 )
-                if neighbor not in visited and grid.is_walkable(current, neighbor):
+                if neighbor not in visited and grid.is_walkable(
+                        current, neighbor):
                     visited.add(neighbor)
                     came_from[neighbor] = current
                     queue.append(neighbor)
@@ -217,7 +219,8 @@ class Ghost:
             effective_speed *= self.FRIGHTENED_SPEED_MULTIPLIER
             self.recovery_timer = self.SPEED_RECOVERY_DURATION
         elif self.recovery_timer > 0:
-            recovered = 1.0 - (self.recovery_timer / self.SPEED_RECOVERY_DURATION)
+            recovered = 1.0 - (self.recovery_timer /
+                               self.SPEED_RECOVERY_DURATION)
             multiplier = self.FRIGHTENED_SPEED_MULTIPLIER + (
                 1.0 - self.FRIGHTENED_SPEED_MULTIPLIER
             ) * recovered

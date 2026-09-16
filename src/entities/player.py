@@ -41,7 +41,7 @@ class Player:
 
     def update(self, grid: GridQuery, dt: float) -> None:
         if (
-            self.direction is not Direction.NONE
+            self.direction != Direction.NONE
             and self.progress > 0.0
             and self._is_opposite(
                 self.requested_direction,
@@ -68,7 +68,8 @@ class Player:
                 self.position[1] + self.direction.value[1],
             )
             self._pick_next_direction(grid)
-            if self.direction is Direction.NONE:
+            current_direction: Direction = self.direction
+            if current_direction == Direction.NONE:
                 self.progress = 0.0
                 break
 

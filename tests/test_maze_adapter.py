@@ -249,7 +249,7 @@ def test_pickups_fill_every_reachable_non_spawn_cell() -> None:
     }
 
 
-@pytest.mark.parametrize(
+@pytest.mark.parametrize(  # type: ignore[misc]
     "bad_maze",
     [
         open_walls(7, 6),
@@ -355,6 +355,7 @@ def test_validation_rejects_disconnected_or_overlapping_level_data() -> None:
     )
     with pytest.raises(ValueError, match="cover every reachable"):
         validate_level_data(missing_pickup)
+
 
 def test_generator_runtime_error_becomes_value_error() -> None:
     config = make_config()

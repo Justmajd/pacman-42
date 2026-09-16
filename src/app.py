@@ -1,4 +1,5 @@
 from random import Random
+from typing import cast
 
 import pygame
 
@@ -31,7 +32,7 @@ from src.ui.screens import (
     VictoryScreen,
 )
 from src.world import World
-from src.highscore import load_highscores, save_highscores,HighscoreEntry
+from src.highscore import load_highscores, save_highscores, HighscoreEntry
 from src.cheat import CheatController
 
 SCATTER_DURATION = 7.0
@@ -117,7 +118,8 @@ def run_app(config: GameConfig) -> int:
         menu=Menu(options=["Start", "Highscores", "Instructions", "Exit"])
     )
     pause_screen = PauseScreen(menu=Menu(options=["Resume", "Main Menu"]))
-    game_over_screen = GameOverScreen(menu=Menu(options=["Retry", "Main Menu"]))
+    game_over_screen = GameOverScreen(
+        menu=Menu(options=["Retry", "Main Menu"]))
     victory_screen = VictoryScreen(menu=Menu(options=["Retry", "Main Menu"]))
     highscore_screen = HighscoreScreen(entries=[])
     instructions_screen = InstructionsScreen()
@@ -153,7 +155,7 @@ def run_app(config: GameConfig) -> int:
         elif target_state == GameState.PAUSED:
             pause_screen.render(renderer.screen)
         elif target_state == GameState.PLAYING:
-            renderer.render(game_snapshot)
+            renderer.render(cast(GameSnapshot, game_snapshot))
         elif target_state == GameState.GAME_OVER:
             game_over_screen.render(renderer.screen, session.score)
         elif target_state == GameState.VICTORY:
@@ -162,7 +164,6 @@ def run_app(config: GameConfig) -> int:
             highscore_screen.render(renderer.screen)
         elif target_state == GameState.INSTRUCTIONS:
             instructions_screen.render(renderer.screen)
-
 
     while renderer.is_running:
         dt = renderer.tick()
@@ -202,7 +203,8 @@ def run_app(config: GameConfig) -> int:
                         pending_state = GameState.PLAYING
                         transition = Transition()
                     elif next_state == GameState.HIGHSCORES:
-                        menu_highscores = load_highscores(config.highscore_filename)
+                        menu_highscores = load_highscores(
+                            config.highscore_filename)
                         highscore_screen.entries = menu_highscores
                         state = GameState.HIGHSCORES
                     elif next_state == GameState.INSTRUCTIONS:
@@ -229,11 +231,18 @@ def run_app(config: GameConfig) -> int:
                 for event in events:
                     entering_name = game_over_screen.entering_name
                     next_state = game_over_screen.handle_event(event)
-                    if entering_name == True and game_over_screen.entering_name == False and len(game_over_screen.name) > 0 :
+                    if (
+                        entering_name
+                        and not game_over_screen.entering_name
+                        and len(game_over_screen.name) > 0
+                    ):
                         highscores = load_highscores(config.highscore_filename)
-                        new_highscore :HighscoreEntry = HighscoreEntry(name=game_over_screen.name, score=session.score)
-                        highscores.append(new_highscore)
-                        save_highscores(path=config.highscore_filename, entries=highscores)
+                        game_over_highscore = HighscoreEntry(
+                            name=game_over_screen.name, score=session.score)
+                        highscores.append(game_over_highscore)
+                        save_highscores(
+                            path=config.highscore_filename,
+                            entries=highscores)
                     if next_state == GameState.PLAYING:
                         new_game_pending = True
                         pending_state = GameState.PLAYING
@@ -245,11 +254,18 @@ def run_app(config: GameConfig) -> int:
                 for event in events:
                     entering_name = victory_screen.entering_name
                     next_state = victory_screen.handle_event(event)
-                    if entering_name == True and victory_screen.entering_name == False and len(victory_screen.name) > 0 :
+                    if (
+                        entering_name
+                        and not victory_screen.entering_name
+                        and len(victory_screen.name) > 0
+                    ):
                         highscores = load_highscores(config.highscore_filename)
-                        new_highscore :HighscoreEntry = HighscoreEntry(name=victory_screen.name, score=session.score)
-                        highscores.append(new_highscore)
-                        save_highscores(path=config.highscore_filename, entries=highscores)
+                        victory_highscore = HighscoreEntry(
+                            name=victory_screen.name, score=session.score)
+                        highscores.append(victory_highscore)
+                        save_highscores(
+                            path=config.highscore_filename,
+                            entries=highscores)
                     if next_state == GameState.PLAYING:
                         new_game_pending = True
                         pending_state = GameState.PLAYING
@@ -282,7 +298,10 @@ def run_app(config: GameConfig) -> int:
                         for event in events:
                             cheat_controller.handle_event(event)
                             if event.type == pygame.KEYDOWN:
-                                if event.key == pygame.K_ESCAPE and state == GameState.PLAYING:
+                                if (
+                                    event.key == pygame.K_ESCAPE
+                                    and state == GameState.PLAYING
+                                ):
                                     pause_screen.capture_background(
                                         renderer.screen
                                     )
@@ -368,12 +387,16 @@ def run_app(config: GameConfig) -> int:
                                 else:
                                     session.handle_event(WorldEvent.PLAYER_HIT)
                                     player_is_dying = True
-                                    if session.state == GameState.GAME_OVER:
+                                    if cast(GameState, session.state) == (
+                                        GameState.GAME_OVER
+                                    ):
                                         game_over_freeze = (
                                             GAME_OVER_FREEZE_DURATION
                                         )
                                     else:
-                                        respawn_freeze = RESPAWN_FREEZE_DURATION
+                                        respawn_freeze = (
+                                            RESPAWN_FREEZE_DURATION
+                                        )
                         session.update(dt=dt)
                 elif session.state == GameState.GAME_OVER:
                     game_over_freeze -= dt

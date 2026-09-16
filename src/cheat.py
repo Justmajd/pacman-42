@@ -34,7 +34,8 @@ class CheatController:
         direction = key_to_direction(event.key)
         if direction is not None:
             self._direction_buffer.append(direction)
-            self._direction_buffer = self._direction_buffer[-len(SECRET_SEQUENCE):]
+            self._direction_buffer = self._direction_buffer[-len(
+                SECRET_SEQUENCE):]
             if tuple(self._direction_buffer) == SECRET_SEQUENCE:
                 self._direction_buffer.clear()
                 if self.enabled:

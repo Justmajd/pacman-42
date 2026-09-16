@@ -1,4 +1,5 @@
 import os
+from typing import Any
 
 os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
 
@@ -22,7 +23,7 @@ def key_event(key: int, unicode: str = "") -> pygame.event.Event:
     return pygame.event.Event(pygame.KEYDOWN, key=key, unicode=unicode)
 
 
-def type_text(screen: object, text: str) -> None:
+def type_text(screen: Any, text: str) -> None:
     for char in text:
         key = getattr(pygame, f"K_{char.lower()}")
         screen.handle_event(key_event(key, unicode=char.lower()))
@@ -124,7 +125,7 @@ def test_pause_screen_main_menu_option() -> None:
     assert result == GameState.MENU
 
 
-# --- InstructionsScreen --------------------------------------------------------
+# --- InstructionsScreen -------------------------------------------------
 
 def test_instructions_screen_escape_returns_to_menu() -> None:
     screen = InstructionsScreen()
@@ -168,7 +169,8 @@ def test_game_over_screen_backspace_removes_last_character() -> None:
     assert screen.name == "A"
 
 
-def test_game_over_screen_menu_navigation_disabled_while_entering_name() -> None:
+def test_game_over_screen_menu_navigation_disabled_while_entering_name(
+) -> None:
     screen = GameOverScreen(menu=Menu(options=["Retry", "Main Menu"]))
 
     screen.handle_event(key_event(pygame.K_DOWN))

@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 import pytest
 
@@ -18,7 +19,7 @@ def test_validate_name_accepts_valid_names() -> None:
     assert validate_name("1234567890") == "1234567890"
 
 
-@pytest.mark.parametrize(
+@pytest.mark.parametrize(  # type: ignore[misc]
     "name",
     [
         "",
@@ -35,7 +36,7 @@ def test_validate_name_rejects_invalid_names(name: object) -> None:
         validate_name(name)
 
 
-@pytest.mark.parametrize(
+@pytest.mark.parametrize(  # type: ignore[misc]
     "name",
     [
         42,
@@ -56,7 +57,7 @@ def test_validate_score_accepts_non_negative_integers() -> None:
     assert validate_score(100000) == 100000
 
 
-@pytest.mark.parametrize(
+@pytest.mark.parametrize(  # type: ignore[misc]
     "score",
     [
         -1,
@@ -130,7 +131,7 @@ def test_normalize_entries_does_not_modify_original_list() -> None:
     assert entries == original
 
 
-def test_load_missing_file_returns_empty_list(tmp_path) -> None:
+def test_load_missing_file_returns_empty_list(tmp_path: Path) -> None:
     path = tmp_path / "missing.json"
 
     result = load_highscores(str(path))
@@ -138,7 +139,7 @@ def test_load_missing_file_returns_empty_list(tmp_path) -> None:
     assert result == []
 
 
-def test_load_empty_file_returns_empty_list(tmp_path) -> None:
+def test_load_empty_file_returns_empty_list(tmp_path: Path) -> None:
     path = tmp_path / "highscore.json"
     path.write_text("", encoding="utf-8")
 
@@ -147,7 +148,7 @@ def test_load_empty_file_returns_empty_list(tmp_path) -> None:
     assert result == []
 
 
-def test_load_corrupt_json_returns_empty_list(tmp_path) -> None:
+def test_load_corrupt_json_returns_empty_list(tmp_path: Path) -> None:
     path = tmp_path / "highscore.json"
     path.write_text("{broken json", encoding="utf-8")
 
@@ -156,7 +157,7 @@ def test_load_corrupt_json_returns_empty_list(tmp_path) -> None:
     assert result == []
 
 
-def test_load_wrong_root_type_returns_empty_list(tmp_path) -> None:
+def test_load_wrong_root_type_returns_empty_list(tmp_path: Path) -> None:
     path = tmp_path / "highscore.json"
     path.write_text(
         json.dumps({"name": "MAJD", "score": 500}),
@@ -168,7 +169,8 @@ def test_load_wrong_root_type_returns_empty_list(tmp_path) -> None:
     assert result == []
 
 
-def test_load_skips_invalid_entries_but_keeps_valid_ones(tmp_path) -> None:
+def test_load_skips_invalid_entries_but_keeps_valid_ones(
+        tmp_path: Path) -> None:
     path = tmp_path / "highscore.json"
 
     data = [
@@ -190,7 +192,7 @@ def test_load_skips_invalid_entries_but_keeps_valid_ones(tmp_path) -> None:
     ]
 
 
-def test_load_normalizes_and_keeps_top_ten(tmp_path) -> None:
+def test_load_normalizes_and_keeps_top_ten(tmp_path: Path) -> None:
     path = tmp_path / "highscore.json"
 
     data = [
@@ -207,7 +209,7 @@ def test_load_normalizes_and_keeps_top_ten(tmp_path) -> None:
     assert result[-1].score == 200
 
 
-def test_save_and_load_round_trip(tmp_path) -> None:
+def test_save_and_load_round_trip(tmp_path: Path) -> None:
     path = tmp_path / "highscore.json"
 
     entries = [
@@ -226,7 +228,7 @@ def test_save_and_load_round_trip(tmp_path) -> None:
     ]
 
 
-def test_save_writes_valid_json(tmp_path) -> None:
+def test_save_writes_valid_json(tmp_path: Path) -> None:
     path = tmp_path / "highscore.json"
 
     entries = [
@@ -245,7 +247,7 @@ def test_save_writes_valid_json(tmp_path) -> None:
     ]
 
 
-def test_save_keeps_only_top_ten(tmp_path) -> None:
+def test_save_keeps_only_top_ten(tmp_path: Path) -> None:
     path = tmp_path / "highscore.json"
 
     entries = [
@@ -261,7 +263,7 @@ def test_save_keeps_only_top_ten(tmp_path) -> None:
     assert loaded[-1].score == 200
 
 
-def test_save_rejects_invalid_name(tmp_path) -> None:
+def test_save_rejects_invalid_name(tmp_path: Path) -> None:
     path = tmp_path / "highscore.json"
 
     entries = [
@@ -272,7 +274,7 @@ def test_save_rejects_invalid_name(tmp_path) -> None:
         save_highscores(str(path), entries)
 
 
-def test_save_rejects_invalid_score(tmp_path) -> None:
+def test_save_rejects_invalid_score(tmp_path: Path) -> None:
     path = tmp_path / "highscore.json"
 
     entries = [
@@ -283,7 +285,7 @@ def test_save_rejects_invalid_score(tmp_path) -> None:
         save_highscores(str(path), entries)
 
 
-def test_save_uses_temporary_file_and_replaces_it(tmp_path) -> None:
+def test_save_uses_temporary_file_and_replaces_it(tmp_path: Path) -> None:
     path = tmp_path / "highscore.json"
     temp_path = tmp_path / "highscore.json.tmp"
 
@@ -300,7 +302,7 @@ def test_save_uses_temporary_file_and_replaces_it(tmp_path) -> None:
     ]
 
 
-def test_save_replaces_existing_file(tmp_path) -> None:
+def test_save_replaces_existing_file(tmp_path: Path) -> None:
     path = tmp_path / "highscore.json"
 
     old_data = [
@@ -320,14 +322,16 @@ def test_save_replaces_existing_file(tmp_path) -> None:
         HighscoreEntry("MAJD", 500),
         HighscoreEntry("OMAR", 300),
     ]
+
+
 def test_load_highscores_returns_empty_list_on_os_error(
-    tmp_path,
-    monkeypatch,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     path = tmp_path / "highscores.json"
     path.write_text("[]", encoding="utf-8")
 
-    def failing_open(*args, **kwargs):
+    def failing_open(*args: object, **kwargs: object) -> None:
         raise PermissionError("permission denied")
 
     monkeypatch.setattr("builtins.open", failing_open)
