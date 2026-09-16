@@ -421,7 +421,7 @@ def run_app(config: GameConfig) -> int:
         )
         cheats = (
             ("INVINCIBLE", "F1", cheat_controller.invincible),
-            ("GHOSTS FROZEN", "F2", cheat_controller.ghosts_frozen),
+            ("GHOSTS STOP", "F2", cheat_controller.ghosts_frozen),
             ("EXTRA LIFE", "F3", False),
             ("SPEED BOOST", "F4", cheat_controller.speed_boosted),
             ("LEVEL SKIP", "F5", False),
