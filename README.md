@@ -6,7 +6,7 @@
 
 Pac-Man 42 is a Pac-Man-style game written in Python with Pygame as part of the 42 curriculum.
 
-The goal of the activity is to build a complete playable game while applying modular software design, configuration-driven behavior, procedural maze generation, persistent data storage, testing, packaging, and collaborative project management.
+The goal of the activity is to build a complete playable game while applying modular software design, configuration-driven behavior, procedural maze generation, persistent data storage, packaging, and collaborative project management.
 
 The game includes:
 
@@ -21,7 +21,7 @@ The game includes:
 - Main menu, pause menu, instructions screen, highscore screen, game-over screen, and victory screen.
 - Persistent top-10 highscores.
 - Name entry with validation.
-- Cheat mode for testing and peer evaluation.
+- Cheat mode for peer evaluation.
 - A reproducible standalone build using PyInstaller.
 
 The project targets Python 3.10 or newer.
@@ -96,18 +96,6 @@ The program expects exactly one configuration-file argument.
 
 ```bash
 make debug
-```
-
-### Run tests
-
-```bash
-make test
-```
-
-or:
-
-```bash
-python3 -m pytest
 ```
 
 ### Clean generated files
@@ -186,7 +174,7 @@ Player names are limited to 10 characters and may contain alphanumeric character
 
 ## Cheat Mode
 
-Cheat mode is included to make testing and peer evaluation easier.
+Cheat mode is included to make peer evaluation easier.
 
 Enter the following directional sequence during gameplay:
 
@@ -544,8 +532,6 @@ src/app.py
 - **`highscore.py`** owns persistent leaderboard data.
 - **`cheat.py`** owns cheat-sequence and cheat-state logic.
 
-This separation allows individual modules to be tested without requiring the entire game loop to run.
-
 ---
 
 ## Project Management
@@ -561,10 +547,9 @@ The work was split between team members so that different areas could progress i
 - UI and state transitions
 - highscore persistence
 - cheat mode
-- testing
 - packaging and deployment preparation
 
-Git branches, commits, merges, and targeted tests were used to integrate changes incrementally.
+Git branches, commits, and merges were used to integrate changes incrementally.
 
 Project-management notes are stored in the dedicated directory:
 
@@ -577,24 +562,6 @@ The current tracked project-management document is:
 It records design decisions and questions related to graphics, maze integration, gameplay, and packaging.
 
 ---
-
-## Testing
-
-The project uses `pytest`.
-
-Run the complete test suite with:
-
-```bash
-make test
-```
-
-or:
-
-```bash
-python3 -m pytest
-```
-
-The test suite covers multiple parts of the project, including configuration, maze adaptation, gameplay/session logic, entities, screens, rendering, highscores, and cheat controls.
 
 ---
 
@@ -611,8 +578,6 @@ The build script:
 - creates `run-pacman.sh`
 - marks the launcher as executable
 
-The packaged game has been tested independently of the development virtual environment.
-
 ---
 
 ## Resources
@@ -627,7 +592,6 @@ The following references are useful for understanding the technologies and conce
 - Python `pathlib`: https://docs.python.org/3/library/pathlib.html
 - Pygame Community Edition documentation: https://pyga.me/docs/
 - PyInstaller documentation: https://pyinstaller.org/en/stable/
-- pytest documentation: https://docs.pytest.org/
 - PEP 8 — Style Guide for Python Code: https://peps.python.org/pep-0008/
 - PEP 257 — Docstring Conventions: https://peps.python.org/pep-0257/
 - 42 project subject and evaluation requirements supplied with the activity.
@@ -642,11 +606,10 @@ They were used for:
 - interpreting and checking project requirements
 - discussing architecture and module boundaries
 - reviewing developer-written code and identifying bugs
-- suggesting and drafting test cases
 - reviewing highscore and maze-generation edge cases
 - drafting and reviewing project documentation, including this README
 - fixing all mypy and flake8 errors after finishing development
-AI assistance was used as a support and review tool. The authors remained responsible for understanding the implementation, integrating changes, testing the final behavior, and making the final project decisions.
+AI assistance was used as a support and review tool. The authors remained responsible for understanding the implementation, integrating changes, and making the final project decisions.
 
 ---
 
@@ -678,7 +641,6 @@ pacman-42/
 │   ├── input.py
 │   ├── maze_adapter.py
 │   └── world.py
-├── tests/
 ├── build.sh
 ├── config.example.json
 ├── config.json

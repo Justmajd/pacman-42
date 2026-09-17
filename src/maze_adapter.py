@@ -302,16 +302,16 @@ class MazeGeneratorProvider:
         return width, height
 
     @staticmethod
-    def _resolve_seed(seed: int | None, level_number: int) -> int | None:
+    def _resolve_seed(seed: int | None, level_number: int) -> int:
         if level_number == 1:
             return 42
         if seed is None:
-            return None
+            return 0
         if isinstance(seed, bool) or not isinstance(seed, int):
             raise ValueError(
-                f"Seed must be an int or None, got {seed!r}"
+                f"Seed must be an int, got {seed!r}"
             )
-        return None
+        return 0
 
     @overload
     def build_level(self, level_number: int) -> LevelData:
