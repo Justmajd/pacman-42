@@ -26,6 +26,11 @@ The game includes:
 
 The project targets Python 3.10 or newer.
 
+## Links
+
+- [Play Pac-Man 42 on itch.io](https://justmajd.itch.io/pacman-42)
+- [Project management](project_management/README.md)
+
 ---
 
 ## Instructions
