@@ -216,6 +216,10 @@ def run_app(config: GameConfig) -> int:
                         state = GameState.PLAYING
                     if next_state == GameState.MENU:
                         pending_state = GameState.MENU
+                        cheat_controller.enabled = False
+                        cheat_controller.invincible = False
+                        cheat_controller.speed_boosted = False
+                        cheat_controller.ghosts_frozen = False
                         transition = Transition()
             elif state == GameState.HIGHSCORES:
                 for event in events:
