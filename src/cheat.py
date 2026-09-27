@@ -1,4 +1,3 @@
-from dataclasses import dataclass, field
 from src.contracts import Direction
 from src.input import key_to_direction
 import pygame
@@ -11,15 +10,15 @@ SECRET_SEQUENCE: tuple[Direction, ...] = (
 )
 
 
-@dataclass
 class CheatController:
-    enabled: bool = False
-    invincible: bool = False
-    ghosts_frozen: bool = False
-    speed_boosted: bool = False
-    _direction_buffer: list[Direction] = field(default_factory=list)
-    _extra_life_requested: bool = False
-    _level_skip_requested: bool = False
+    def __init__(self) -> None:
+        self.enabled: bool = False
+        self.invincible: bool = False
+        self.ghosts_frozen: bool = False
+        self.speed_boosted: bool = False
+        self._direction_buffer: list[Direction] = []
+        self._extra_life_requested: bool = False
+        self._level_skip_requested: bool = False
 
     def handle_event(self, event: pygame.event.Event) -> None:
         if event.type != pygame.KEYDOWN:

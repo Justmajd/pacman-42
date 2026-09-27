@@ -1,4 +1,3 @@
-from dataclasses import dataclass, field
 from src.contracts import GameState, Direction
 from src.ui.menu import Menu
 from src.input import key_to_direction
@@ -9,15 +8,11 @@ import pygame
 FONT_PATH = "assets/fonts/PressStart2P.ttf"
 
 
-@dataclass
 class MainMenuScreen:
-    menu: Menu
-    font: pygame.font.Font = field(
-        default_factory=lambda: pygame.font.Font(
-            FONT_PATH, 20))
-    title_font: pygame.font.Font = field(
-        default_factory=lambda: pygame.font.Font(
-            FONT_PATH, 100))
+    def __init__(self, menu: Menu) -> None:
+        self.menu = menu
+        self.font: pygame.font.Font = pygame.font.Font(FONT_PATH, 20)
+        self.title_font: pygame.font.Font = pygame.font.Font(FONT_PATH, 100)
 
     def handle_event(self, event: pygame.event.Event) -> GameState | None:
         if event.type != pygame.KEYDOWN:
@@ -85,13 +80,11 @@ class MainMenuScreen:
             screen.blit(text_surface, (x, menu_start_y + index * 40))
 
 
-@dataclass
 class PauseScreen:
-    menu: Menu
-    blurred_background: pygame.Surface | None = None
-    font: pygame.font.Font = field(
-        default_factory=lambda: pygame.font.Font(
-            FONT_PATH, 20))
+    def __init__(self, menu: Menu) -> None:
+        self.menu = menu
+        self.blurred_background: pygame.Surface | None = None
+        self.font: pygame.font.Font = pygame.font.Font(FONT_PATH, 20)
 
     def handle_event(self, event: pygame.event.Event) -> GameState | None:
         if event.type != pygame.KEYDOWN:
@@ -135,17 +128,13 @@ class PauseScreen:
 NAME_MAX_LENGTH = 10
 
 
-@dataclass
 class GameOverScreen:
-    menu: Menu
-    font: pygame.font.Font = field(
-        default_factory=lambda: pygame.font.Font(
-            FONT_PATH, 20))
-    title_font: pygame.font.Font = field(
-        default_factory=lambda: pygame.font.Font(
-            FONT_PATH, 56))
-    name: str = ""
-    entering_name: bool = True
+    def __init__(self, menu: Menu) -> None:
+        self.menu = menu
+        self.font: pygame.font.Font = pygame.font.Font(FONT_PATH, 20)
+        self.title_font: pygame.font.Font = pygame.font.Font(FONT_PATH, 56)
+        self.name: str = ""
+        self.entering_name: bool = True
 
     def handle_event(self, event: pygame.event.Event) -> GameState | None:
         if event.type != pygame.KEYDOWN:
@@ -227,17 +216,13 @@ class GameOverScreen:
             screen.blit(text_surface, (x, menu_start_y + index * 40))
 
 
-@dataclass
 class VictoryScreen:
-    menu: Menu
-    font: pygame.font.Font = field(
-        default_factory=lambda: pygame.font.Font(
-            FONT_PATH, 20))
-    title_font: pygame.font.Font = field(
-        default_factory=lambda: pygame.font.Font(
-            FONT_PATH, 48))
-    name: str = ""
-    entering_name: bool = True
+    def __init__(self, menu: Menu) -> None:
+        self.menu = menu
+        self.font: pygame.font.Font = pygame.font.Font(FONT_PATH, 20)
+        self.title_font: pygame.font.Font = pygame.font.Font(FONT_PATH, 48)
+        self.name: str = ""
+        self.entering_name: bool = True
 
     def handle_event(self, event: pygame.event.Event) -> GameState | None:
         if event.type != pygame.KEYDOWN:
@@ -319,12 +304,12 @@ class VictoryScreen:
             screen.blit(text_surface, (x, menu_start_y + index * 40))
 
 
-@dataclass
 class Transition:
-    elapsed: float = 0.0
-    covering: bool = True
-    frame_duration: float = 0.04
-    finished: bool = False
+    def __init__(self) -> None:
+        self.elapsed: float = 0.0
+        self.covering: bool = True
+        self.frame_duration: float = 0.04
+        self.finished: bool = False
 
     def update(self, dt: float) -> None:
         self.elapsed += dt
@@ -358,14 +343,10 @@ class Transition:
                                                  y2 - y1))
 
 
-@dataclass
 class InstructionsScreen:
-    font: pygame.font.Font = field(
-        default_factory=lambda: pygame.font.Font(
-            FONT_PATH, 20))
-    title_font: pygame.font.Font = field(
-        default_factory=lambda: pygame.font.Font(
-            FONT_PATH, 56))
+    def __init__(self) -> None:
+        self.font: pygame.font.Font = pygame.font.Font(FONT_PATH, 20)
+        self.title_font: pygame.font.Font = pygame.font.Font(FONT_PATH, 56)
 
     def handle_event(self, event: pygame.event.Event) -> GameState | None:
         if event.type != pygame.KEYDOWN:
@@ -404,15 +385,11 @@ class InstructionsScreen:
         screen.blit(back_surface, (back_x, screen.get_height() - 60))
 
 
-@dataclass
 class HighscoreScreen:
-    entries: list[HighscoreEntry]
-    font: pygame.font.Font = field(
-        default_factory=lambda: pygame.font.Font(
-            FONT_PATH, 20))
-    title_font: pygame.font.Font = field(
-        default_factory=lambda: pygame.font.Font(
-            FONT_PATH, 56))
+    def __init__(self, entries: list[HighscoreEntry]) -> None:
+        self.entries = entries
+        self.font: pygame.font.Font = pygame.font.Font(FONT_PATH, 20)
+        self.title_font: pygame.font.Font = pygame.font.Font(FONT_PATH, 56)
 
     def handle_event(self, event: pygame.event.Event) -> GameState | None:
         if event.type != pygame.KEYDOWN:

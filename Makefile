@@ -15,9 +15,8 @@ debug:
 
 clean:
 	find . -type d -name "__pycache__" -prune -exec rm -rf {} +
-	rm -rf .mypy_cache .pytest_cache
+	rm -rf .mypy_cache
 	rm -rf build dist
-	rm -rf *.egg-info
 
 lint:
 	flake8 .
@@ -27,4 +26,4 @@ lint-strict:
 	flake8 .
 	mypy . --strict
 
-.PHONY: install run debug clean lint lint-strict test
+.PHONY: install run debug clean lint lint-strict
