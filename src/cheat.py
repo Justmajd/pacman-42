@@ -18,8 +18,8 @@ class CheatController:
     ghosts_frozen: bool = False
     speed_boosted: bool = False
     _direction_buffer: list[Direction] = field(default_factory=list)
-    _extra_life_requested: bool = field(default=False)
-    _level_skip_requested: bool = field(default=False)
+    _extra_life_requested: bool = False
+    _level_skip_requested: bool = False
 
     def handle_event(self, event: pygame.event.Event) -> None:
         if event.type != pygame.KEYDOWN:
