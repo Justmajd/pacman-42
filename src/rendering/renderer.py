@@ -81,6 +81,28 @@ class Renderer:
         self._draw_walls(self.background_surface_white,
                          level_data, (255, 255, 255))
 
+    def _draw_sprite(
+        self,
+        sprite: tuple[str, ...],
+        origin_x: int,
+        origin_y: int,
+        pixel_size: int,
+        color: tuple[int, int, int],
+    ) -> None:
+        for row_idx, row in enumerate(sprite):
+            for col_idx, cell in enumerate(row):
+                if cell == '#':
+                    pygame.draw.rect(
+                        self.screen,
+                        color,
+                        pygame.Rect(
+                            origin_x + col_idx * pixel_size,
+                            origin_y + row_idx * pixel_size,
+                            pixel_size,
+                            pixel_size,
+                        ),
+                    )
+
     def _draw_walls(
         self,
         background_surface: pygame.Surface,
@@ -188,19 +210,10 @@ class Renderer:
                 + (self.tile_size - pacgum_height) // 2
             )
 
-            for row_idx, row in enumerate(PACGUMS):
-                for col_idx, cell in enumerate(row):
-                    if cell == '#':
-                        pygame.draw.rect(
-                            self.screen,
-                            (255, 255, 255),
-                            pygame.Rect(
-                                origin_x + col_idx * pacgum_pixel_size,
-                                origin_y + row_idx * pacgum_pixel_size,
-                                pacgum_pixel_size,
-                                pacgum_pixel_size,
-                            ),
-                        )
+            self._draw_sprite(
+                PACGUMS, origin_x, origin_y,
+                pacgum_pixel_size, (255, 255, 255),
+            )
 
         super_pacgum_pixel_size = max(1, self.tile_size // 16)
         super_pacgum_width = (
@@ -222,19 +235,10 @@ class Renderer:
                 + (self.tile_size - super_pacgum_height) // 2
             )
 
-            for row_idx, row in enumerate(SUPER_PACGUMS):
-                for col_idx, cell in enumerate(row):
-                    if cell == '#':
-                        pygame.draw.rect(
-                            self.screen,
-                            (255, 255, 255),
-                            pygame.Rect(
-                                origin_x + col_idx * super_pacgum_pixel_size,
-                                origin_y + row_idx * super_pacgum_pixel_size,
-                                super_pacgum_pixel_size,
-                                super_pacgum_pixel_size,
-                            ),
-                        )
+            self._draw_sprite(
+                SUPER_PACGUMS, origin_x, origin_y,
+                super_pacgum_pixel_size, (255, 255, 255),
+            )
 
         interp_x, interp_y = snapshot.player_pos
         pixel_x = self.left_margin + interp_x * self.tile_size
@@ -256,19 +260,10 @@ class Renderer:
             sprite_y = pixel_y + \
                 (self.tile_size - pixel_size * len(sprite_to_draw)) // 2
 
-            for row_idx, row in enumerate(sprite_to_draw):
-                for col_idx, cell in enumerate(row):
-                    if cell == '#':
-                        pygame.draw.rect(
-                            self.screen,
-                            (255, 255, 0),
-                            pygame.Rect(
-                                sprite_x + col_idx * pixel_size,
-                                sprite_y + row_idx * pixel_size,
-                                pixel_size,
-                                pixel_size,
-                            ),
-                        )
+            self._draw_sprite(
+                sprite_to_draw, sprite_x, sprite_y,
+                pixel_size, (255, 255, 0),
+            )
         else:
             self.death_animation_start = None
 
@@ -300,19 +295,10 @@ class Renderer:
             sprite_y = pixel_y + \
                 (self.tile_size - pixel_size * len(sprite_to_draw)) // 2
 
-            for row_idx, row in enumerate(sprite_to_draw):
-                for col_idx, cell in enumerate(row):
-                    if cell == '#':
-                        pygame.draw.rect(
-                            self.screen,
-                            (255, 255, 0),
-                            pygame.Rect(
-                                sprite_x + col_idx * pixel_size,
-                                sprite_y + row_idx * pixel_size,
-                                pixel_size,
-                                pixel_size,
-                            ),
-                        )
+            self._draw_sprite(
+                sprite_to_draw, sprite_x, sprite_y,
+                pixel_size, (255, 255, 0),
+            )
 
         for ghost in snapshot.ghosts:
             if not ghost.is_active:
@@ -347,19 +333,9 @@ class Renderer:
                 else:
                     sprite_to_draw = GHOST2
 
-                for row_idx, row in enumerate(sprite_to_draw):
-                    for col_idx, cell in enumerate(row):
-                        if cell == '#':
-                            pygame.draw.rect(
-                                self.screen,
-                                color,
-                                pygame.Rect(
-                                    pixel_x + col_idx * pixel_size,
-                                    pixel_y + row_idx * pixel_size,
-                                    pixel_size,
-                                    pixel_size,
-                                ),
-                            )
+                self._draw_sprite(
+                    sprite_to_draw, pixel_x, pixel_y, pixel_size, color,
+                )
 
             if not ghost.is_frightened or ghost.is_eaten:
                 eyes_col_offset = 2
@@ -383,54 +359,28 @@ class Renderer:
                     pupil_row_offset += 3
                     eyes_row_offset += 1
 
-                for row_idx, row in enumerate(GHOST_EYES):
-                    for col_idx, cell in enumerate(row):
-                        if cell == '#':
-                            pygame.draw.rect(
-                                self.screen, (255, 255, 255),
-                                pygame.Rect(
-                                    pixel_x
-                                    + (eyes_col_offset + col_idx) * pixel_size,
-                                    pixel_y
-                                    + (eyes_row_offset + row_idx) * pixel_size,
-                                    pixel_size, pixel_size,
-                                ),
-                            )
-
-                for row_idx, row in enumerate(GHOST_EYES_PUPIL):
-                    for col_idx, cell in enumerate(row):
-                        if cell == '#':
-                            pygame.draw.rect(
-                                self.screen, (0, 0, 255),
-                                pygame.Rect(
-                                    pixel_x
-                                    + (
-                                        pupil_col_offset + col_idx
-                                    ) * pixel_size,
-                                    pixel_y
-                                    + (
-                                        pupil_row_offset + row_idx
-                                    ) * pixel_size,
-                                    pixel_size, pixel_size,
-                                ),
-                            )
+                self._draw_sprite(
+                    GHOST_EYES,
+                    pixel_x + eyes_col_offset * pixel_size,
+                    pixel_y + eyes_row_offset * pixel_size,
+                    pixel_size, (255, 255, 255),
+                )
+                self._draw_sprite(
+                    GHOST_EYES_PUPIL,
+                    pixel_x + pupil_col_offset * pixel_size,
+                    pixel_y + pupil_row_offset * pixel_size,
+                    pixel_size, (0, 0, 255),
+                )
             else:
                 face_col_offset = 1
                 face_row_offset = 4
 
-                for row_idx, row in enumerate(GHOST_FRIGHTENED_FACE):
-                    for col_idx, cell in enumerate(row):
-                        if cell == '#':
-                            pygame.draw.rect(
-                                self.screen, face_color,
-                                pygame.Rect(
-                                    pixel_x
-                                    + (face_col_offset + col_idx) * pixel_size,
-                                    pixel_y
-                                    + (face_row_offset + row_idx) * pixel_size,
-                                    pixel_size, pixel_size,
-                                ),
-                            )
+                self._draw_sprite(
+                    GHOST_FRIGHTENED_FACE,
+                    pixel_x + face_col_offset * pixel_size,
+                    pixel_y + face_row_offset * pixel_size,
+                    pixel_size, face_color,
+                )
 
         score = f"{snapshot.score}"
         score_surface = self.font.render(score, True, (255, 255, 255))
@@ -455,17 +405,9 @@ class Renderer:
         icon_pixel_size = icon_size // 13
         icon_x = lives_center[0] - icon_size // 2
         icon_y = lives_center[1] - icon_size // 2
-        for row_idx, row in enumerate(PACMAN_RIGHT):
-            for col_idx, cell in enumerate(row):
-                if cell == '#':
-                    pygame.draw.rect(
-                        self.screen, (255, 255, 0),
-                        pygame.Rect(
-                            icon_x + col_idx * icon_pixel_size,
-                            icon_y + row_idx * icon_pixel_size,
-                            icon_pixel_size, icon_pixel_size,
-                        ),
-                    )
+        self._draw_sprite(
+            PACMAN_RIGHT, icon_x, icon_y, icon_pixel_size, (255, 255, 0),
+        )
         lives = f"x {snapshot.lives}"
         lives_surface = self.font.render(lives, True, (255, 255, 255))
         x = lives_center[0] + lives_radius + 10
