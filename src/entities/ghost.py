@@ -259,5 +259,3 @@ class Ghost:
         self.is_eaten = False
         self.frightened_immune = False
         self.recovery_timer = 0.0
-        self.requested_direction = Direction.NONE
-        self.facing = Direction.NONE
