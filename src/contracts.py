@@ -13,7 +13,6 @@ class GameState(Enum):
     PAUSED = auto()
     GAME_OVER = auto()
     VICTORY = auto()
-    NAME_ENTRY = auto()
     HIGHSCORES = auto()
     INSTRUCTIONS = auto()
     EXIT = auto()

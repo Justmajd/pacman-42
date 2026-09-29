@@ -1,14 +1,14 @@
-PYTHON := python3
-PIP := $(PYTHON) -m pip
-CONFIG ?= config.example.json
-MAZE_WHEEL := mazegenerator-2.1.0-py3-none-any.whl
+PYTHON = python3
+PIP = $(PYTHON) -m pip
+CONFIG = config.example.json
+MAZE_WHEEL = mazegenerator-2.1.0-py3-none-any.whl
 
 install:
 	$(PIP) install -r requirements.txt
 	$(PIP) install ./$(MAZE_WHEEL)
 
 run:
-	$(PYTHON) pac-man.py $(CONFIG)
+	$(PYTHON) pac-man.py $(CONFIG) || True
 
 debug:
 	$(PYTHON) -m pdb pac-man.py $(CONFIG)

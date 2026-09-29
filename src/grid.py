@@ -43,24 +43,3 @@ class Grid:
                 return True
         else:
             return False
-
-    def neighbours(
-        self,
-        position: Position,
-    ) -> tuple[Position, ...]:
-        walkable_neighbours: list[Position] = []
-        cx, cy = position
-        nx, ny = cx, cy - 1
-        sx, sy = cx, cy + 1
-        ex, ey = cx + 1, cy
-        wx, wy = cx - 1, cy
-        if self.is_walkable(position, (nx, ny)):
-            walkable_neighbours.append((nx, ny))
-        if self.is_walkable(position, (sx, sy)):
-            walkable_neighbours.append((sx, sy))
-        if self.is_walkable(position, (ex, ey)):
-            walkable_neighbours.append((ex, ey))
-        if self.is_walkable(position, (wx, wy)):
-            walkable_neighbours.append((wx, wy))
-
-        return tuple(walkable_neighbours)

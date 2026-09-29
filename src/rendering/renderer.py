@@ -1,3 +1,5 @@
+from typing import Sequence
+
 import pygame
 
 from src.contracts import LevelData, Direction, GameSnapshot
@@ -83,9 +85,9 @@ class Renderer:
 
     def _draw_sprite(
         self,
-        sprite: tuple[str, ...],
-        origin_x: int,
-        origin_y: int,
+        sprite: Sequence[str],
+        origin_x: float,
+        origin_y: float,
         pixel_size: int,
         color: tuple[int, int, int],
     ) -> None:
