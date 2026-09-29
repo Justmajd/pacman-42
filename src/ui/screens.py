@@ -307,23 +307,23 @@ class VictoryScreen:
 class Transition:
     def __init__(self) -> None:
         self.elapsed: float = 0.0
-        self.covering: bool = True
         self.frame_duration: float = 0.04
         self.finished: bool = False
 
+    @property
+    def covering(self) -> bool:
+        frame_index = int(self.elapsed / self.frame_duration)
+        return frame_index < len(PACMAN_TRANSITION) // 2
+
     def update(self, dt: float) -> None:
         self.elapsed += dt
-        if self.covering and self.elapsed >= 17 * self.frame_duration:
-            self.covering = False
-            self.elapsed = 0.0
-        if not self.covering and self.elapsed >= 17 * self.frame_duration:
+        total_duration = len(PACMAN_TRANSITION) * self.frame_duration
+        if self.elapsed >= total_duration:
             self.finished = True
 
     def render(self, screen: pygame.Surface) -> None:
         frame_index = int(self.elapsed / self.frame_duration)
-        frame_index = min(frame_index, 16)
-        if not self.covering:
-            frame_index = 16 - frame_index
+        frame_index = min(frame_index, len(PACMAN_TRANSITION) - 1)
 
         frame = PACMAN_TRANSITION[frame_index]
 
