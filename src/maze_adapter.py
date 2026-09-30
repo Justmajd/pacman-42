@@ -1,5 +1,5 @@
 from collections import deque
-from typing import Any, Callable, overload
+from typing import Any, Callable
 
 from mazegenerator import MazeGenerator
 
@@ -19,7 +19,6 @@ _DIRECTIONS: tuple[tuple[int, int, int], ...] = (
 )
 
 GeneratorFactory = Callable[..., Any]
-_SEED_NOT_PROVIDED = object()
 
 
 def _is_valid_int(value: object) -> bool:
@@ -313,22 +312,10 @@ class MazeGeneratorProvider:
             )
         return 0
 
-    @overload
-    def build_level(self, level_number: int) -> LevelData:
-        ...
-
-    @overload
     def build_level(
         self,
         level_number: int,
-        seed: int | None,
-    ) -> LevelData:
-        ...
-
-    def build_level(
-        self,
-        level_number: int,
-        seed: object = _SEED_NOT_PROVIDED,
+        seed: int | None = None,
     ) -> LevelData:
         width, height = self._level_config(level_number)
         if not _is_valid_int(self.pacgum_count):
@@ -340,17 +327,14 @@ class MazeGeneratorProvider:
                 "Configured pacgum_count must be a positive int"
             )
 
-        if seed is _SEED_NOT_PROVIDED:
-            base_seed: int | None = self.config.seed
-        elif seed is None or (
-            isinstance(seed, int) and not isinstance(seed, bool)
+        if not (
+            seed is None
+            or (isinstance(seed, int) and not isinstance(seed, bool))
         ):
-            base_seed = seed
-        else:
             raise ValueError(
                 f"Seed must be an int or None, got {seed!r}"
             )
-        resolved_seed = self._resolve_seed(base_seed, level_number)
+        resolved_seed = self._resolve_seed(seed, level_number)
         try:
             generator = self.generator_factory(
                 size=(width, height),
