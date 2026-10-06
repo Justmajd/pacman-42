@@ -46,7 +46,13 @@ def read_config_file(path: str) -> dict[str, object]:
 
 
 def load_config(path: str) -> GameConfig:
-    config_json = read_config_file(path=path)
+    try:
+        config_json = read_config_file(path=path)
+    except ValueError as error:
+        logger.warning(
+            "Invalid configuration (%s); using default values", error
+        )
+        return GameConfig()
     try:
         lives = config_json['lives']
     except KeyError:

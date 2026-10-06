@@ -1,6 +1,6 @@
 PYTHON = python3
 PIP = $(PYTHON) -m pip
-CONFIG = config.example.json
+CONFIG = config.json
 MAZE_WHEEL = mazegenerator-2.1.0-py3-none-any.whl
 
 install:

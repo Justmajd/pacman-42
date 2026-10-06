@@ -86,7 +86,7 @@ make run
 By default, the Makefile runs the game with:
 
 ```text
-config.example.json
+config.json
 ```
 
 The game can also be launched directly:
