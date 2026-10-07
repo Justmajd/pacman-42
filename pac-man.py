@@ -1,5 +1,5 @@
 import sys
-from src.config import load_config
+from src import load_config
 
 
 def main() -> int:
